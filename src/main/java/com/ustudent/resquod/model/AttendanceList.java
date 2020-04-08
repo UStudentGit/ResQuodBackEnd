@@ -13,7 +13,7 @@ public class AttendanceList {
     private String name;
 
     @ManyToOne
-    private Lesson lesson;
+    private Event event;
 
     @ManyToOne
     private Administrator administrator;
@@ -40,12 +40,12 @@ public class AttendanceList {
         this.name = name;
     }
 
-    public Lesson getLesson() {
-        return lesson;
+    public Event getEvent() {
+        return event;
     }
 
-    public void setLesson(Lesson lesson) {
-        this.lesson = lesson;
+    public void setEvent(Event event) {
+        this.event = event;
     }
 
     public Administrator getAdministrator() {

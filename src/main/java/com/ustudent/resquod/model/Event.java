@@ -5,8 +5,8 @@ import java.time.DayOfWeek;
 import java.time.LocalTime;
 
 @Entity
-@Table(name = "lessons")
-public class Lesson {
+@Table(name = "events")
+public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
@@ -15,7 +15,7 @@ public class Lesson {
     private LocalTime eventTime;
 
     @ManyToOne
-    private Hall hall;
+    private Room room;
 
     public Integer getId() {
         return id;
@@ -49,11 +49,11 @@ public class Lesson {
         this.eventTime = eventTime;
     }
 
-    public Hall getHall() {
-        return hall;
+    public Room getRoom() {
+        return room;
     }
 
-    public void setHall(Hall hall) {
-        this.hall = hall;
+    public void setRoom(Room room) {
+        this.room = room;
     }
 }

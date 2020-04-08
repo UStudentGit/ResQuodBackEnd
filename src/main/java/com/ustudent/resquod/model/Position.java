@@ -11,7 +11,7 @@ public class Position {
     private Integer numberOfPosition;
 
     @ManyToOne
-    private Hall hall;
+    private Room room;
 
     public Integer getId() {
         return Id;
@@ -29,11 +29,11 @@ public class Position {
         this.numberOfPosition = numberOfPosition;
     }
 
-    public Hall getHall() {
-        return hall;
+    public Room getRoom() {
+        return room;
     }
 
-    public void setHall(Hall hall) {
-        this.hall = hall;
+    public void setRoom(Room room) {
+        this.room = room;
     }
 }

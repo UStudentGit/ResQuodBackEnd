@@ -14,9 +14,38 @@ public class User {
     private String surname;
     private String email;
     private String password;
+    private String role;
 
     @ManyToMany(mappedBy = "users")
     private List<AttendanceList> attendanceLists = new ArrayList<>();
+
+    public User() {
+        this.role = "USER";
+    }
+
+    public User(String name, String surname, String email, String password) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.role = "USER";
+    }
+
+    public User(String name, String surname, String email, String password, String role) {
+        this.name = name;
+        this.surname = surname;
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
 
     public Integer getId() {
         return id;

@@ -3,8 +3,8 @@ package com.ustudent.resquod.model;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "halls")
-public class Hall {
+@Table(name = "rooms")
+public class Room {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
