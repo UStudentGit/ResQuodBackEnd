@@ -1,15 +1,33 @@
 package com.ustudent.resquod.model;
 
 public class LoginUserData {
-    private String login;
+    private String email;
     private String password;
+    private String role;
 
-    public String getLogin() {
-        return login;
+    public LoginUserData() {
     }
 
-    public void setLogin(String login) {
-        this.login = login;
+    public LoginUserData(String email, String password, String role) {
+        this.email = email;
+        this.password = password;
+        this.role = role;
+    }
+
+    public String getRole() {
+        return role;
+    }
+
+    public void setRole(String role) {
+        this.role = role;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getPassword() {
