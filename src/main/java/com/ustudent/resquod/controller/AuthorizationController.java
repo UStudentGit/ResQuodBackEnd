@@ -1,8 +1,8 @@
 package com.ustudent.resquod.controller;
 
 import com.ustudent.resquod.exception.EmailExistException;
-import com.ustudent.resquod.model.LoginUserData;
 import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.dao.LoginUserData;
 import com.ustudent.resquod.repository.UserRepository;
 import com.ustudent.resquod.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,19 +16,16 @@ import java.util.Optional;
 @RequestMapping("/user")
 public class AuthorizationController {
 
-    private UserRepository userRepository;
-    private PasswordEncoder passwordEncoder;
-    private JwtService jwtService;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Autowired
-    public AuthorizationController(UserRepository userRepository,
-                                   PasswordEncoder passwordEncoder,
-                                   JwtService jwtService) {
+    public AuthorizationController(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
     }
-
 
     @PostMapping("/checkIfMailExist/{email}")
     public Boolean checkIfMailExist(@PathVariable String email) {

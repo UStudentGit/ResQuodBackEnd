@@ -20,7 +20,7 @@ public class User {
     private List<AttendanceList> attendanceLists = new ArrayList<>();
 
     public User() {
-        this.role = "USER";
+        this.role = "ROLE_USER";
     }
 
     public User(String name, String surname, String email, String password) {
@@ -28,7 +28,7 @@ public class User {
         this.surname = surname;
         this.email = email;
         this.password = password;
-        this.role = "USER";
+        this.role = "ROLE_USER";
     }
 
     public User(String name, String surname, String email, String password, String role) {

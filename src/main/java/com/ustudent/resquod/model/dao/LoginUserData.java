@@ -1,4 +1,4 @@
-package com.ustudent.resquod.model;
+package com.ustudent.resquod.model.dao;
 
 public class LoginUserData {
     private String email;

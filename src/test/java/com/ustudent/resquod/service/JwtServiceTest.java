@@ -9,11 +9,10 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class JwtServiceTest {
-
     @Test
     void createAndVerifyToken() throws InterruptedException {
-        JwtService jwtService = new JwtService("test");
-        String token = jwtService.sign("test@wp.pl", "user");
+        JwtService jwtService = new JwtService();
+        String token = jwtService.sign("test@wp.pl", "USER");
         assertNotEquals(jwtService.verify(token), Optional.empty());
         //change expires time before testing!
         Thread.sleep(10000);

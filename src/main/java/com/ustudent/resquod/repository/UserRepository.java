@@ -1,7 +1,7 @@
 package com.ustudent.resquod.repository;
 
-import com.ustudent.resquod.model.LoginUserData;
 import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.dao.LoginUserData;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
