@@ -1,6 +1,7 @@
 package com.ustudent.resquod.model;
 
 import javax.persistence.*;
+import javax.validation.constraints.Email;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,12 +13,12 @@ public class User {
     private Integer id;
     private String name;
     private String surname;
-    private String email;
+    @ManyToMany(mappedBy = "users")
+    private final List<AttendanceList> attendanceLists = new ArrayList<>();
     private String password;
     private String role;
-
-    @ManyToMany(mappedBy = "users")
-    private List<AttendanceList> attendanceLists = new ArrayList<>();
+    @Email
+    private String email;
 
     public User() {
         this.role = "ROLE_USER";

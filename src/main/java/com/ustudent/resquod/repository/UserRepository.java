@@ -15,7 +15,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     Optional<User> findByEmail(String email);
 
-    @Query(value = "SELECT new com.ustudent.resquod.model.LoginUserData(u.email, u.password, u.role) " +
+    @Query(value = "SELECT new com.ustudent.resquod.model.dao.LoginUserData(u.email, u.password, u.role) " +
             "FROM  User u WHERE u.email = ?1")
     Optional<LoginUserData> findUserPassword(String email);
 
