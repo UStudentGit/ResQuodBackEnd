@@ -37,12 +37,11 @@ public class UserService {
     }
 
     public void validateRegistrationData(User inputData) throws InvalidInputException {
-        System.out.println("aaa");
-        if (inputData.getEmail() == null || inputData.getEmail().isEmpty() ||
-                inputData.getName() == null || inputData.getName().isEmpty() ||
-                inputData.getSurname() == null || inputData.getSurname().isEmpty() ||
-                inputData.getPassword().length() < 6) throw new InvalidInputException();
-        System.out.println("dzial");
+        if (inputData.getEmail() == null || inputData.getEmail().length() < 2 || !inputData.getEmail().contains("@") ||
+                inputData.getName() == null || inputData.getName().length() < 2 ||
+                inputData.getSurname() == null || inputData.getSurname().length() < 2 ||
+                inputData.getPassword() == null || inputData.getPassword().length() < 6)
+            throw new InvalidInputException();
     }
 
     public void addUser(User inputData) throws RuntimeException {
@@ -61,4 +60,22 @@ public class UserService {
         return true;
     }
 
+    public void validateUserData(User userInput) throws InvalidInputException {
+        if (userInput.getEmail() == null || userInput.getEmail().length() < 2 ||
+                !userInput.getEmail().contains("@") ||
+                userInput.getPassword() == null ||
+                userRepository.findByEmail(userInput.getEmail()).isEmpty() ||
+                userInput.getName() == null || userInput.getName().length() < 2 ||
+                userInput.getSurname() == null || userInput.getSurname().length() < 2)
+            throw new InvalidInputException();
+    }
+
+    public void updateUserData(User userInput) throws InvalidPasswordException {
+        User user = userRepository.findByEmail(userInput.getEmail()).get();
+        verifyPassword(userInput.getPassword(), user.getPassword());
+        user.setName(userInput.getName());
+        user.setSurname(userInput.getSurname());
+        user.setEmail(userInput.getEmail());
+        userRepository.save(user);
+    }
 }
