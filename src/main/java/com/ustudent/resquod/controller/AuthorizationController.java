@@ -7,12 +7,15 @@ import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.LoginUserData;
 import com.ustudent.resquod.service.JwtService;
 import com.ustudent.resquod.service.UserService;
+import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
+@Api(value = "User management")
 @RequestMapping("/user")
 public class AuthorizationController {
 
@@ -25,9 +28,14 @@ public class AuthorizationController {
         this.userService = userService;
     }
 
-
+    @ApiOperation(value = "Create new user")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully created!"),
+            @ApiResponse(code = 400, message = "\"Invalid input!\" or \"Email already taken!\""),
+            @ApiResponse(code = 500, message = "User cannot be registered!")})
     @PostMapping("/register")
-    public String register(@RequestBody User inputData) {
+    public String register(
+            @ApiParam(value = "Required email, name, surname, password", required = true)
+            @RequestBody User inputData) {
         try {
             userService.checkIfMailExist(inputData.getEmail());
             userService.validateRegistrationData(inputData);
@@ -43,8 +51,14 @@ public class AuthorizationController {
 
     }
 
+    @ApiOperation(value = "Login as user")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Token"),
+            @ApiResponse(code = 400, message = "\"Invalid input!\" or \"Email don't exist!\" or \"Invalid password!\""),
+            @ApiResponse(code = 500, message = "Server Error!")})
     @PostMapping("/login")
-    public String login(@RequestBody LoginUserData userInput) {
+    public String login(
+            @ApiParam(value = "Required email, password", required = true)
+            @RequestBody LoginUserData userInput) {
         LoginUserData userData;
         try {
             userService.validateLoginData(userInput);
@@ -60,9 +74,29 @@ public class AuthorizationController {
         return jwtService.sign(userData.getEmail(), userData.getRole());
     }
 
-    @PutMapping("userData")
-    public String changeUserData(@RequestBody User userInput) {
+    @ApiOperation(value = "Get current user")
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @GetMapping("/user")
+    public User getUser() {
         try {
+            String user = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+            return userService.getUser(user);
+        } catch (EmailExistException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+        }
+    }
+
+    @ApiOperation(value = "Change user data")
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully updated!"),
+            @ApiResponse(code = 400, message = "\"Invalid input!\" or \"Invalid password!\""),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @PutMapping("userData")
+    public String changeUserData(
+            @ApiParam(value = "Required email, name, surname, password", required = true)
+            @RequestBody User userInput) {
+        try {
+            //TODO dodać sprawdzanie czy podany user jest teraz zalogowany!
             userService.validateUserData(userInput);
             userService.updateUserData(userInput);
         } catch (InvalidInputException ex) {

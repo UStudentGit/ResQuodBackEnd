@@ -6,6 +6,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTCreationException;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.ustudent.resquod.exception.WrongTokenException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -41,13 +42,12 @@ public class JwtService {
         }
     }
 
-    public DecodedJWT verify(String token) {
+
+    public DecodedJWT verify(String token) throws JWTVerificationException {
         try {
-            DecodedJWT decodedJWT = verifier.verify(token);
-            //System.out.println(decodedJWT.getClaim("role").asString());
-            return decodedJWT;
+            return verifier.verify(token);
         } catch (JWTVerificationException e) {
-            throw new JWTVerificationException("Invalid token");
+            throw new WrongTokenException();
         }
     }
 

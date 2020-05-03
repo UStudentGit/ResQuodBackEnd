@@ -31,6 +31,10 @@ public class UserService {
         return userRepository.findUserPassword(email).orElseThrow(EmailExistException::new);
     }
 
+    public User getUser(String email) throws EmailExistException {
+        return userRepository.findByEmail(email).orElseThrow(EmailExistException::new);
+    }
+
     public void checkIfMailExist(String email) throws EmailExistException {
         if (userRepository.findByEmail(email).isPresent())
             throw new EmailExistException();

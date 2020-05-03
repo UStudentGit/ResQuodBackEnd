@@ -2,8 +2,10 @@ package com.ustudent.resquod.security;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import com.ustudent.resquod.exception.WrongTokenException;
 import com.ustudent.resquod.service.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,18 +32,26 @@ public class JwtFilter extends BasicAuthenticationFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-        String header = request.getHeader("authorization");
-        if (header == null || !header.startsWith("Bearer ")) throw new ServletException("Wrong or empty token");
-        else {
-            if (jwtService == null) {
-                ServletContext context = request.getSession().getServletContext();
-                SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, context);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException {
+        try {
+            String header = request.getHeader("authorization");
+
+            if (header == null || !header.startsWith("Bearer "))
+                throw new WrongTokenException();
+            else {
+                if (jwtService == null) {
+                    ServletContext context = request.getSession().getServletContext();
+                    SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this, context);
+                }
+                String token = header.substring(7);
+                UsernamePasswordAuthenticationToken authentication = getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                chain.doFilter(request, response);
             }
-            String token = header.substring(7);
-            UsernamePasswordAuthenticationToken authentication = getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            chain.doFilter(request, response);
+        } catch (WrongTokenException e) {
+            response.sendError(HttpStatus.BAD_REQUEST.value(), "Wrong or empty token!");
+        } catch (ServletException e) {
+            response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ServletException");
         }
     }
 

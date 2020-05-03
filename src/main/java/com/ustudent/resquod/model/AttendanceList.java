@@ -15,14 +15,11 @@ public class AttendanceList {
     @ManyToOne
     private Event event;
 
-    @ManyToOne
-    private Administrator administrator;
-
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "Attendancelists_Users",
             joinColumns = @JoinColumn(name = "attendanceList_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<User> users = new ArrayList<>();
+    private final List<User> users = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -46,13 +43,5 @@ public class AttendanceList {
 
     public void setEvent(Event event) {
         this.event = event;
-    }
-
-    public Administrator getAdministrator() {
-        return administrator;
-    }
-
-    public void setAdministrator(Administrator administrator) {
-        this.administrator = administrator;
     }
 }
