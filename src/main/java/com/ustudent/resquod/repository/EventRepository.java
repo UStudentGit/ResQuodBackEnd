@@ -1,4 +1,7 @@
 package com.ustudent.resquod.repository;
 
-public interface RoomRepository {
+import com.ustudent.resquod.model.Event;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface EventRepository extends JpaRepository<Event,Integer> {
 }

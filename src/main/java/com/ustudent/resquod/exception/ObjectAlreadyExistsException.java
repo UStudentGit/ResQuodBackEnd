@@ -1,4 +1,4 @@
 package com.ustudent.resquod.exception;
 
-public class ObjectAlreadyExistsException {
+public class ObjectAlreadyExistsException extends Exception {
 }

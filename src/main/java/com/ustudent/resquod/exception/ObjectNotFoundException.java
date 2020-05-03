@@ -1,4 +1,4 @@
 package com.ustudent.resquod.exception;
 
-public class ObjectNotFoundException {
+public class ObjectNotFoundException extends Exception{
 }
