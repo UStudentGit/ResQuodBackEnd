@@ -5,6 +5,7 @@ import com.ustudent.resquod.exception.InvalidInputException;
 import com.ustudent.resquod.exception.InvalidPasswordException;
 import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.LoginUserData;
+import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,8 +32,8 @@ public class UserService {
         return userRepository.findUserPassword(email).orElseThrow(EmailExistException::new);
     }
 
-    public User getUser(String email) throws EmailExistException {
-        return userRepository.findByEmail(email).orElseThrow(EmailExistException::new);
+    public UserData getUser(String email) throws EmailExistException {
+        return userRepository.findUserData(email).orElseThrow(EmailExistException::new);
     }
 
     public void checkIfMailExist(String email) throws EmailExistException {

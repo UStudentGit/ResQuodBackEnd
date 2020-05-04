@@ -1,10 +1,12 @@
-package com.ustudent.resquod;
+package com.ustudent.resquod.configuration;
 
 import com.google.common.base.Predicate;
+import com.google.common.base.Predicates;
 import com.google.common.collect.Lists;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiKey;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -23,15 +25,13 @@ public class SwaggerConfig {
                 .useDefaultResponseMessages(false)
                 .select()
                 .apis(RequestHandlerSelectors.any())
-                .paths(getSwaggerPaths())
+                .paths(paths())
                 .build()
                 .securitySchemes(Lists.newArrayList(apiKey()));
     }
 
-    private Predicate<String> getSwaggerPaths() {
-        return or(
-                regex("/user.*"),
-                regex("/test.*"));
+    private Predicate<String> paths() {
+        return Predicates.not(PathSelectors.regex("/error.*"));
     }
 
 

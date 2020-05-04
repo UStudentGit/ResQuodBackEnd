@@ -5,6 +5,9 @@ import com.ustudent.resquod.exception.InvalidInputException;
 import com.ustudent.resquod.exception.InvalidPasswordException;
 import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.LoginUserData;
+import com.ustudent.resquod.model.dao.ResponseTransfer;
+import com.ustudent.resquod.model.dao.TokenTransfer;
+import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.service.JwtService;
 import com.ustudent.resquod.service.UserService;
 import io.swagger.annotations.*;
@@ -16,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @Api(value = "User management")
-@RequestMapping("/user")
 public class AuthorizationController {
 
     private final JwtService jwtService;
@@ -29,11 +31,11 @@ public class AuthorizationController {
     }
 
     @ApiOperation(value = "Create new user")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully created!"),
+    @ApiResponses(value = {@ApiResponse(code = 200, message ="Successfully created!" ),
             @ApiResponse(code = 400, message = "\"Invalid input!\" or \"Email already taken!\""),
             @ApiResponse(code = 500, message = "User cannot be registered!")})
-    @PostMapping("/register")
-    public String register(
+    @PostMapping(value = "/register")
+    public ResponseTransfer register(
             @ApiParam(value = "Required email, name, surname, password", required = true)
             @RequestBody User inputData) {
         try {
@@ -47,16 +49,18 @@ public class AuthorizationController {
         } catch (RuntimeException ex) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "User cannot be registered!");
         }
-        return "Successfully created!";
+        return new ResponseTransfer("Successfully created!");
 
     }
 
     @ApiOperation(value = "Login as user")
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Token"),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "{\n" +
+            "    \"token\": \"string\"\n" +
+            "}"),
             @ApiResponse(code = 400, message = "\"Invalid input!\" or \"Email don't exist!\" or \"Invalid password!\""),
             @ApiResponse(code = 500, message = "Server Error!")})
     @PostMapping("/login")
-    public String login(
+    public TokenTransfer login(
             @ApiParam(value = "Required email, password", required = true)
             @RequestBody LoginUserData userInput) {
         LoginUserData userData;
@@ -71,28 +75,29 @@ public class AuthorizationController {
         } catch (InvalidPasswordException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid password!");
         }
-        return jwtService.sign(userData.getEmail(), userData.getRole());
+        String token=jwtService.sign(userData.getEmail(), userData.getRole());
+        return new TokenTransfer(token);
     }
 
-    @ApiOperation(value = "Get current user")
+    @ApiOperation(value = "Get current user", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 500, message = "Server Error!")})
     @GetMapping("/user")
-    public User getUser() {
+    public UserData getUser() {
         try {
-            String user = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-            return userService.getUser(user);
+            String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+            return userService.getUser(email);
         } catch (EmailExistException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
         }
     }
 
-    @ApiOperation(value = "Change user data")
+    @ApiOperation(value = "Change user data", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully updated!"),
             @ApiResponse(code = 400, message = "\"Invalid input!\" or \"Invalid password!\""),
             @ApiResponse(code = 500, message = "Server Error!")})
-    @PutMapping("userData")
-    public String changeUserData(
+    @PatchMapping("userPatch")
+    public ResponseTransfer changeUserData(
             @ApiParam(value = "Required email, name, surname, password", required = true)
             @RequestBody User userInput) {
         try {
@@ -104,7 +109,7 @@ public class AuthorizationController {
         } catch (InvalidPasswordException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid password!");
         }
-        return "Successfully updated!";
+        return new ResponseTransfer("Successfully updated!");
     }
 
 
