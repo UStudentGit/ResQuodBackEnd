@@ -5,7 +5,6 @@ import com.ustudent.resquod.exception.ObjectAlreadyExistsException;
 import com.ustudent.resquod.exception.ObjectNotFoundException;
 import com.ustudent.resquod.model.Position;
 import com.ustudent.resquod.service.PositionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -14,10 +13,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class PositionController {
 
-    @Autowired
-    PositionService positionService;
+    final PositionService positionService;
 
-    @RequestMapping(method= RequestMethod.POST, value = "/newPosition")
+    public PositionController(PositionService positionService) {
+        this.positionService = positionService;
+    }
+
+    @RequestMapping(method = RequestMethod.POST, value = "/newPosition")
     public String addNewRoom(@RequestBody Position newPosition) {
         try {
             positionService.addNewPosition(newPosition);

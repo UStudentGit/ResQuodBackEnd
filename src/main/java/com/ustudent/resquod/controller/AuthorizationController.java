@@ -31,7 +31,7 @@ public class AuthorizationController {
     }
 
     @ApiOperation(value = "Create new user")
-    @ApiResponses(value = {@ApiResponse(code = 200, message ="Successfully created!" ),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully created!"),
             @ApiResponse(code = 400, message = "\"Invalid input!\" or \"Email already taken!\""),
             @ApiResponse(code = 500, message = "User cannot be registered!")})
     @PostMapping(value = "/register")
@@ -75,7 +75,7 @@ public class AuthorizationController {
         } catch (InvalidPasswordException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid password!");
         }
-        String token=jwtService.sign(userData.getEmail(), userData.getRole());
+        String token = jwtService.sign(userData.getEmail(), userData.getRole());
         return new TokenTransfer(token);
     }
 
