@@ -8,11 +8,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class PositionValidator {
 
-    private PositionRepository positionRepository;
-    private RoomValidator roomValidator;
+    private final PositionRepository positionRepository;
+    private final RoomValidator roomValidator;
 
     @Autowired
-    PositionValidator(PositionRepository positionRepository,RoomValidator roomValidator) {
+    public PositionValidator(PositionRepository positionRepository,RoomValidator roomValidator) {
 
         this.positionRepository=positionRepository;
         this.roomValidator=roomValidator;

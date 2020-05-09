@@ -11,11 +11,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class RoomService {
 
-    private RoomRepository roomRepository;
-    private RoomValidator roomValidator;
+    private final RoomRepository roomRepository;
+    private final RoomValidator roomValidator;
 
     @Autowired
-    RoomService(RoomRepository roomRepository, RoomValidator roomValidator) {
+    public RoomService(RoomRepository roomRepository, RoomValidator roomValidator) {
         this.roomRepository=roomRepository;
         this.roomValidator=roomValidator;
     }

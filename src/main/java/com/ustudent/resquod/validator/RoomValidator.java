@@ -8,9 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class RoomValidator {
 
-    @Autowired
-    RoomRepository roomRepository;
+    private final RoomRepository roomRepository;
 
+    @Autowired
+    public RoomValidator(RoomRepository roomRepository) {
+        this.roomRepository=roomRepository;
+    }
+    
     public boolean checkIfRoomExists(Room roomToValidate) {
 
         if(roomRepository.findByName(roomToValidate.getName()).isPresent())

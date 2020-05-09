@@ -14,13 +14,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class PositionService {
 
-    private PositionRepository positionRepository;
-    private PositionValidator positionValidator;
-    private RoomRepository roomRepository;
-    private RoomValidator roomValidator;
+    private final PositionRepository positionRepository;
+    private final PositionValidator positionValidator;
+    private final RoomRepository roomRepository;
+    private final RoomValidator roomValidator;
 
     @Autowired
-    PositionService(PositionRepository positionRepository,PositionValidator positionValidator,
+    public PositionService(PositionRepository positionRepository,PositionValidator positionValidator,
                     RoomRepository roomRepository,RoomValidator roomValidator) {
         this.positionRepository=positionRepository;
         this.roomRepository=roomRepository;
