@@ -1,31 +1,25 @@
 package com.ustudent.resquod.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "attendanceList")
+@Table(name = "attendanceLists")
 public class AttendanceList {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
-
-    @ManyToOne
+    private LocalDateTime createTime;
+    @ManyToOne(fetch = FetchType.LAZY)
     private Event event;
 
-    @ManyToMany(cascade = {CascadeType.ALL})
-    @JoinTable(name = "Attendancelists_Users",
-            joinColumns = @JoinColumn(name = "attendanceList_id"),
-            inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private final List<User> users = new ArrayList<>();
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -43,5 +37,13 @@ public class AttendanceList {
 
     public void setEvent(Event event) {
         this.event = event;
+    }
+
+    public LocalDateTime getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(LocalDateTime createTime) {
+        this.createTime = createTime;
     }
 }

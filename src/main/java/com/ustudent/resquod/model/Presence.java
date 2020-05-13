@@ -7,8 +7,8 @@ import java.util.Date;
 @Table(name = "presences")
 public class Presence {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private Boolean presence;
     private Date date;
 
@@ -18,11 +18,11 @@ public class Presence {
     @ManyToOne
     private AttendanceList attendanceList;
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
