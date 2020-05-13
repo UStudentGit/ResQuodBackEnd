@@ -1,23 +1,26 @@
 package com.ustudent.resquod.model;
 
+import org.hibernate.validator.constraints.UniqueElements;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "positions")
 public class Position {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer Id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long Id;
     private Integer numberOfPosition;
-
-    @ManyToOne
+    @UniqueElements
+    private String tagId;
+    @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
 
-    public Integer getId() {
+    public Long getId() {
         return Id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         Id = id;
     }
 
@@ -35,5 +38,13 @@ public class Position {
 
     public void setRoom(Room room) {
         this.room = room;
+    }
+
+    public String getTagId() {
+        return tagId;
+    }
+
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
     }
 }

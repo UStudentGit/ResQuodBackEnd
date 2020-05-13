@@ -3,22 +3,26 @@ package com.ustudent.resquod.model;
 import javax.persistence.*;
 import javax.validation.constraints.Email;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
-@Table(name = "users")
+@Table(name = "users", indexes = @Index(columnList = "email"))
 public class User {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
-    private String name;
-    private String surname;
-    @ManyToMany(mappedBy = "users")
-    private final List<AttendanceList> attendanceLists = new ArrayList<>();
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String password;
     private String role;
     @Email
     private String email;
+    private String name;
+    private String surname;
+    @ManyToMany(mappedBy = "users")
+    private final Set<Event> events = new HashSet<>();
+    @ManyToMany(mappedBy = "users")
+    private final Set<Corporation> corporations = new HashSet<>();
 
     public User() {
         this.role = "ROLE_USER";
@@ -32,13 +36,6 @@ public class User {
         this.role = "ROLE_USER";
     }
 
-    public User(String name, String surname, String email, String password, String role) {
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
-        this.password = password;
-        this.role = role;
-    }
 
     public String getRole() {
         return role;
@@ -48,11 +45,11 @@ public class User {
         this.role = role;
     }
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -88,4 +85,11 @@ public class User {
         this.password = password;
     }
 
+    public Set<Event> getEvents() {
+        return events;
+    }
+
+    public Set<Corporation> getCorporations() {
+        return corporations;
+    }
 }

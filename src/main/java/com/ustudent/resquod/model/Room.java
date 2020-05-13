@@ -6,16 +6,18 @@ import javax.persistence.*;
 @Table(name = "rooms")
 public class Room {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Integer id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String name;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private Corporation corporation;
 
 
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -25,5 +27,13 @@ public class Room {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Corporation getCorporation() {
+        return corporation;
+    }
+
+    public void setCorporation(Corporation corporation) {
+        this.corporation = corporation;
     }
 }
