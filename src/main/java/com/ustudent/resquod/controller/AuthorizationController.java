@@ -3,11 +3,10 @@ package com.ustudent.resquod.controller;
 import com.ustudent.resquod.exception.EmailExistException;
 import com.ustudent.resquod.exception.InvalidInputException;
 import com.ustudent.resquod.exception.InvalidPasswordException;
+import com.ustudent.resquod.exception.PasswordMatchedException;
 import com.ustudent.resquod.model.User;
-import com.ustudent.resquod.model.dao.LoginUserData;
-import com.ustudent.resquod.model.dao.ResponseTransfer;
-import com.ustudent.resquod.model.dao.TokenTransfer;
-import com.ustudent.resquod.model.dao.UserData;
+import com.ustudent.resquod.model.dao.*;
+
 import com.ustudent.resquod.service.JwtService;
 import com.ustudent.resquod.service.UserService;
 import io.swagger.annotations.*;
@@ -101,7 +100,6 @@ public class AuthorizationController {
             @ApiParam(value = "Required email, name, surname, password", required = true)
             @RequestBody User userInput) {
         try {
-            //TODO dodać sprawdzanie czy podany user jest teraz zalogowany!
             userService.validateUserData(userInput);
             userService.updateUserData(userInput);
         } catch (InvalidInputException ex) {
@@ -112,5 +110,28 @@ public class AuthorizationController {
         return new ResponseTransfer("Successfully updated!");
     }
 
+    @ApiOperation(value = "password", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully changed!"),
+            @ApiResponse(code = 400, message = "\"Password too short or too long\" or \"Password don't match!\" or \"Password Canno't be the same!\""),
+            @ApiResponse(code = 500, message = "Password Cannot be changed")})
+    @PatchMapping(value = "/password")
+    public ResponseTransfer changePassowrd(
+            @ApiParam(value = "Required oldPassword, newPassword", required = true)
+            @RequestBody UserPassword inputData) {
+        try {
+            userService.changePassword(inputData);
+        } catch (InvalidInputException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password too short or too long!", ex); }
+         catch (InvalidPasswordException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password don't match!", ex);
+        } catch (PasswordMatchedException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Password Canno't be the same!", ex);
+        } catch (RuntimeException ex) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Password Canno't be changed!", ex);
+        }
+
+        return new ResponseTransfer("Successfully changed!");
+
+    }
 
 }
