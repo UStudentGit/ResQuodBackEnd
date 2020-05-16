@@ -6,6 +6,7 @@ import com.ustudent.resquod.exception.InvalidPasswordException;
 import com.ustudent.resquod.exception.PasswordMatchedException;
 import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.LoginUserData;
+import com.ustudent.resquod.model.dao.RegisterUserData;
 import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.model.dao.UserPassword;
 import com.ustudent.resquod.repository.UserRepository;
@@ -48,7 +49,7 @@ public class UserService {
             throw new EmailExistException();
     }
 
-    public void validateRegistrationData(User inputData) throws InvalidInputException {
+    public void validateRegistrationData(RegisterUserData inputData) throws InvalidInputException {
         if (inputData.getEmail() == null || inputData.getEmail().length() < 2 || !inputData.getEmail().contains("@") ||
                 inputData.getName() == null || inputData.getName().length() < 2 ||
                 inputData.getSurname() == null || inputData.getSurname().length() < 2 ||
@@ -56,7 +57,7 @@ public class UserService {
             throw new InvalidInputException();
     }
 
-    public void addUser(User inputData) throws RuntimeException {
+    public void addUser(RegisterUserData inputData) throws RuntimeException {
         userRepository.save(new User(inputData.getName(),
                 inputData.getSurname(),
                 inputData.getEmail(),
@@ -72,7 +73,7 @@ public class UserService {
         return true;
     }
 
-    public void validateUserData(User userInput) throws InvalidInputException {
+    public void validateUserData(RegisterUserData userInput) throws InvalidInputException {
         if (userInput.getEmail() == null || userInput.getEmail().length() < 2 ||
                 !userInput.getEmail().contains("@") ||
                 userInput.getPassword() == null ||
@@ -82,7 +83,7 @@ public class UserService {
             throw new InvalidInputException();
     }
 
-    public void updateUserData(User userInput) throws InvalidPasswordException, InvalidInputException {
+    public void updateUserData(RegisterUserData userInput) throws InvalidPasswordException, InvalidInputException {
         if (userInput.getPassword() == null || userInput.getPassword().length() < 6
                   || userInput.getPassword().length() > 32)
             throw new InvalidInputException();

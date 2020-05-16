@@ -36,7 +36,7 @@ public class AuthorizationController {
     @PostMapping(value = "/register")
     public ResponseTransfer register(
             @ApiParam(value = "Required email, name, surname, password", required = true)
-            @RequestBody User inputData) {
+            @RequestBody RegisterUserData inputData) {
         try {
             userService.checkIfMailExist(inputData.getEmail());
             userService.validateRegistrationData(inputData);
@@ -98,7 +98,7 @@ public class AuthorizationController {
     @PatchMapping("userPatch")
     public ResponseTransfer changeUserData(
             @ApiParam(value = "Required email, name, surname, password", required = true)
-            @RequestBody User userInput) {
+            @RequestBody RegisterUserData userInput) {
         try {
             userService.validateUserData(userInput);
             userService.updateUserData(userInput);

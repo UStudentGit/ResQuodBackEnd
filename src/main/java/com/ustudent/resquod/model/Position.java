@@ -5,14 +5,13 @@ import org.hibernate.validator.constraints.UniqueElements;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "positions")
+@Table(name = "positions", uniqueConstraints={@UniqueConstraint(columnNames = {"tag_id"})})
 public class Position {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long Id;
     private Integer numberOfPosition;
-    @UniqueElements
-    private String tagId;
+    private String tag_id;
     @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
 
@@ -41,10 +40,10 @@ public class Position {
     }
 
     public String getTagId() {
-        return tagId;
+        return tag_id;
     }
 
-    public void setTagId(String tagId) {
-        this.tagId = tagId;
+    public void setTagId(String tag_id) {
+        this.tag_id = tag_id;
     }
 }
