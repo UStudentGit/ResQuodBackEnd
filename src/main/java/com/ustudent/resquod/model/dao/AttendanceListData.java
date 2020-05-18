@@ -1,19 +1,19 @@
-package com.ustudent.resquod.model;
+package com.ustudent.resquod.model.dao;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Entity
-@Table(name = "attendance_lists")
-public class AttendanceList {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class AttendanceListData {
     private Long id;
     private String name;
     private LocalDateTime createTime;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private Event event;
+    private Long event_id;
 
+    public AttendanceListData(Long id, String name, LocalDateTime createTime, Long event_id){
+        this.id = id;
+        this.name = name;
+        this.createTime = createTime;
+        this.event_id = event_id;
+    }
 
     public Long getId() {
         return id;
@@ -31,12 +31,12 @@ public class AttendanceList {
         this.name = name;
     }
 
-    public Event getEvent() {
-        return event;
+    public Long getEventID() {
+        return event_id;
     }
 
-    public void setEvent(Event event) {
-        this.event = event;
+    public void setEventID(Long event_id) {
+        this.event_id = event_id;
     }
 
     public LocalDateTime getCreateTime() {
