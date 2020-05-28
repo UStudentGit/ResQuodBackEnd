@@ -1,5 +1,6 @@
 package com.ustudent.resquod;
 
+import com.fasterxml.jackson.datatype.hibernate5.Hibernate5Module;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -16,5 +17,10 @@ public class ResquodApplication {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public Hibernate5Module datatypeHibernateModule() {
+        return new Hibernate5Module();
     }
 }

@@ -1,4 +1,7 @@
 package com.ustudent.resquod.exception;
 
-public class AttendanceListNotFoundException {
+public class AttendanceListNotFoundException extends RuntimeException {
+    public AttendanceListNotFoundException(){
+
+    }
 }

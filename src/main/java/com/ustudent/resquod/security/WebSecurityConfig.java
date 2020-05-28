@@ -1,13 +1,9 @@
 package com.ustudent.resquod.security;
 
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 
 @Configuration
@@ -24,7 +20,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             //Api
             "/test1",
             "/login*",
-            "/register*"
+            "/register*",
+
             // other public endpoints of your API may be appended to this array
     };
 

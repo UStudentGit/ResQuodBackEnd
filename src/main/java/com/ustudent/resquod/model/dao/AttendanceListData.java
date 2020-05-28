@@ -6,14 +6,16 @@ public class AttendanceListData {
     private Long id;
     private String name;
     private LocalDateTime createTime;
-    private Long event_id;
+    private Long eventId;
+    private String stringRequest;
 
-    public AttendanceListData(Long id, String name, LocalDateTime createTime, Long event_id){
+    public AttendanceListData(Long id, String name, LocalDateTime createTime, Long eventId){
         this.id = id;
         this.name = name;
         this.createTime = createTime;
-        this.event_id = event_id;
+        this.eventId = eventId;
     }
+    public AttendanceListData(){}
 
     public Long getId() {
         return id;
@@ -32,11 +34,11 @@ public class AttendanceListData {
     }
 
     public Long getEventID() {
-        return event_id;
+        return eventId;
     }
 
     public void setEventID(Long event_id) {
-        this.event_id = event_id;
+        this.eventId = event_id;
     }
 
     public LocalDateTime getCreateTime() {
@@ -45,5 +47,21 @@ public class AttendanceListData {
 
     public void setCreateTime(LocalDateTime createTime) {
         this.createTime = createTime;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
+    }
+
+    public String getStringRequest() {
+        return stringRequest;
+    }
+
+    public void setStringRequest(String stringRequest) {
+        this.stringRequest = stringRequest;
     }
 }

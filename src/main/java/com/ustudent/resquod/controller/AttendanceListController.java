@@ -1,23 +1,30 @@
 package com.ustudent.resquod.controller;
 
+import com.ustudent.resquod.exception.AttendanceListNotFoundException;
 import com.ustudent.resquod.exception.EmailExistException;
+import com.ustudent.resquod.exception.EventNotFoundException;
+import com.ustudent.resquod.model.AttendanceList;
 import com.ustudent.resquod.model.dao.AttendanceListData;
+import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.service.AttendanceListService;
 import com.ustudent.resquod.service.UserService;
-import io.swagger.annotations.*;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.List;
 
 @RestController
 public class AttendanceListController {
 
-    private final AttendanceListService attendanceListService;
+    @Autowired
+    private AttendanceListService attendanceListService;
     private final UserService userService;
 
     @Autowired
@@ -26,9 +33,57 @@ public class AttendanceListController {
         this.userService = userService;
     }
 
+    @ApiOperation(value = "Creates attendance list for specified event", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @PostMapping("/attendancelist")
+    public ResponseTransfer createAttendanceList(@RequestBody AttendanceListData attendanceRequest){
+        attendanceListService.createAttendanceList(attendanceRequest.getEventId(), attendanceRequest.getStringRequest());
+
+        return new ResponseTransfer("attendanceList created");
+    }
+
+    @ApiOperation(value = "Returns attendance list for specified event", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @GetMapping("/attendancelist/{eventId}")
+    public AttendanceList getAttendanceList(@PathVariable(value="eventId") Long eventId) {
+        try {
+            return attendanceListService.getAttendanceList(eventId);
+        } catch (EventNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event not found! Bad request");
+        }
+
+    }
+
+    @ApiOperation(value = "Returns present users data from specified Attendance List", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @GetMapping("/presence/{attendanceListId}")
+    public List<UserData> getPresentUsers(@PathVariable(value="attendanceListId") Long attendanceListId){
+        try {
+            return attendanceListService.getPresentUsers(attendanceListId);
+        } catch (AttendanceListNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Attendance list not found! Bad request");
+        }
+    }
+
+    @ApiOperation(value = "Returns absent users data from specified Attendance List", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @GetMapping("/absence/{attendanceListId}")
+    public List<UserData> getAbsentUsers(@PathVariable(value="attendanceListId") Long attendanceListId){
+        try {
+            return attendanceListService.getAbsentUsers(attendanceListId);
+        } catch (AttendanceListNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Attendance list not found! Bad request");
+        }
+    }
+
     @ApiOperation(value = "Returns the current user's attendance lists", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
             @ApiResponse(code = 500, message = "Server Error!")})
+
     @GetMapping(value = "/userAttendanceLists")
     public List<AttendanceListData> getUserAttendanceLists() {
         try {

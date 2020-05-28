@@ -1,5 +1,7 @@
 package com.ustudent.resquod.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
@@ -10,10 +12,19 @@ public class AttendanceList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @JsonIgnore
     private LocalDateTime createTime;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private Event event;
 
+    public AttendanceList(Event event, String name) {
+        this.event = event;
+        this.name = name;
+    }
+
+    public  AttendanceList(){}
 
     public Long getId() {
         return id;

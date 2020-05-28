@@ -1,11 +1,11 @@
 package com.ustudent.resquod.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 import java.time.DayOfWeek;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -15,18 +15,33 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
+
+    @JsonIgnore
     private DayOfWeek dayOfWeek;
+
+    @JsonIgnore
     private LocalTime eventTimeStart;
+
+    @JsonIgnore
     private LocalTime eventTimeEnd;
+
+    @JsonIgnore
     private Long administratorId;
+
+    @JsonIgnore
     private String password;
+
+    @JsonIgnore
     @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
+
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "Events_Users",
             joinColumns = @JoinColumn(name = "events_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private final Set<User> users = new HashSet<>();
+
+    private  Set<User> users = new HashSet<>();
 
     public Long getId() {
         return id;
