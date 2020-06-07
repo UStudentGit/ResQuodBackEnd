@@ -1,26 +1,24 @@
 package com.ustudent.resquod.model;
 
-import org.hibernate.validator.constraints.UniqueElements;
-
 import javax.persistence.*;
 
 @Entity
-@Table(name = "positions", uniqueConstraints={@UniqueConstraint(columnNames = {"tag_id"})})
+@Table(name = "positions", uniqueConstraints={@UniqueConstraint(columnNames = {"tagId"})})
 public class Position {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long Id;
+    private Long id;
     private Integer numberOfPosition;
-    private String tag_id;
+    private String tagId;
     @ManyToOne(fetch = FetchType.LAZY)
     private Room room;
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        this.id = id;
     }
 
     public Integer getNumberOfPosition() {
@@ -40,10 +38,10 @@ public class Position {
     }
 
     public String getTagId() {
-        return tag_id;
+        return tagId;
     }
 
-    public void setTagId(String tag_id) {
-        this.tag_id = tag_id;
+    public void setTagId(String tagId) {
+        this.tagId = tagId;
     }
 }

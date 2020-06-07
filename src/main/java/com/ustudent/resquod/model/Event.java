@@ -15,9 +15,6 @@ public class Event {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private DayOfWeek dayOfWeek;
-    private LocalTime eventTimeStart;
-    private LocalTime eventTimeEnd;
     private Long administratorId;
     private String password;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,15 +40,6 @@ public class Event {
     public void setName(String name) {
         this.name = name;
     }
-
-    public DayOfWeek getDayOfWeek() {
-        return dayOfWeek;
-    }
-
-    public void setDayOfWeek(DayOfWeek dayOfWeek) {
-        this.dayOfWeek = dayOfWeek;
-    }
-
     public Room getRoom() {
         return room;
     }
@@ -60,28 +48,12 @@ public class Event {
         this.room = room;
     }
 
-    public LocalTime getEventTimeStart() {
-        return eventTimeStart;
-    }
-
     public String getPassword() {
         return password;
     }
 
     public void setPassword(String password) {
         this.password = password;
-    }
-
-    public void setEventTimeStart(LocalTime eventTimeStart) {
-        this.eventTimeStart = eventTimeStart;
-    }
-
-    public LocalTime getEventTimeEnd() {
-        return eventTimeEnd;
-    }
-
-    public void setEventTimeEnd(LocalTime eventTimeEnd) {
-        this.eventTimeEnd = eventTimeEnd;
     }
 
     public Long getAdministratorId() {

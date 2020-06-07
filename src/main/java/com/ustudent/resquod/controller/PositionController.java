@@ -6,31 +6,41 @@ import com.ustudent.resquod.model.dao.PositionData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.service.PositionService;
 import io.swagger.annotations.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 @RestController
+@Api(value="Position Management")
 public class PositionController {
 
-    final PositionService positionService;
+    private final PositionService positionService;
 
+    @Autowired
     public PositionController(PositionService positionService) {
         this.positionService = positionService;
     }
 
-    @RequestMapping(method = RequestMethod.POST, value = "/newPosition")
-    public String addNewRoom(@RequestBody Position newPosition) {
+    @ApiOperation(value = "Add New Position")
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Position Added Succesfully."),
+            @ApiResponse(code = 400, message = "\"Invalid Input.\" or \"Possition Already Exists.\" or \"Id Tag Already Exists.\""),
+            @ApiResponse( code = 404, message = "Room Does Not Exist.")})
+    @RequestMapping(method = RequestMethod.POST, value = "/position")
+    public ResponseTransfer addNewPosition(@ApiParam(value = "Required Number Of Position, Room")@RequestBody Position newPosition) {
         try {
             positionService.addNewPosition(newPosition);
-        } catch (ObjectAlreadyExistsException exception) {
-            return "Room already exists.";
+        } catch (PositionAlreadyExistsException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Position Already Exists");
         } catch (InvalidInputException exception) {
-            return "Invalid input.";
-        } catch (ObjectNotFoundException exception) {
-            return "Room does not exists.";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Input");
+        } catch (RoomNotFoundException exception) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room Does Not Exist");
+        } catch (DataIntegrityViolationException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id Tag Already Exists");
         }
-        return "Position added successfully.";
+        return new ResponseTransfer("Position Added Successfully");
     }
 
     @ApiOperation(value = "Change position data", authorizations = {@Authorization(value = "authkey")})

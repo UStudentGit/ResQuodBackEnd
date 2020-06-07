@@ -9,7 +9,6 @@ import com.ustudent.resquod.repository.PositionRepository;
 import com.ustudent.resquod.repository.RoomRepository;
 import com.ustudent.resquod.repository.UserRepository;
 import com.ustudent.resquod.validator.PositionValidator;
-import com.ustudent.resquod.validator.RoomValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,38 +16,37 @@ import org.springframework.stereotype.Service;
 @Service
 public class PositionService {
 
-    private PositionRepository positionRepository;
-    private PositionValidator positionValidator;
-    private RoomRepository roomRepository;
-    private RoomValidator roomValidator;
-    private UserRepository userRepository;
+    private final PositionRepository positionRepository;
+    private final PositionValidator positionValidator;
+    private final RoomRepository roomRepository;
+    private final RoomService roomService;
+    private final UserRepository userRepository;
 
     @Autowired
     PositionService(PositionRepository positionRepository,PositionValidator positionValidator,
-                    RoomRepository roomRepository,RoomValidator roomValidator, UserRepository userRepository) {
+                    RoomRepository roomRepository, UserRepository userRepository,RoomService roomService) {
         this.positionRepository=positionRepository;
         this.roomRepository=roomRepository;
-        this.roomValidator=roomValidator;
         this.positionValidator=positionValidator;
         this.userRepository = userRepository;
+        this.roomService=roomService;
     }
 
-    public void addNewPosition(Position newPosition) throws ObjectAlreadyExistsException, InvalidInputException, ObjectNotFoundException {
+    public void addNewPosition(Position newPosition) throws PositionAlreadyExistsException {
 
-        if(positionValidator.checkIfPositionExists(newPosition)) {
+        if(!checkIfPositionExists(newPosition)) {
             if(positionValidator.validatePosition(newPosition)) {
-                if (!roomValidator.checkIfRoomExists(newPosition.getRoom())) {
-                    newPosition.setRoom(roomRepository.findByName(newPosition.getRoom().getName()).get());
+                Room tempRoom = roomService.getRoomById(newPosition.getRoom());
+                if (tempRoom != null) {
+                    newPosition.setRoom(tempRoom);
                     positionRepository.save(newPosition);
-                } else {
-                    throw new ObjectNotFoundException();
-                }
+                } else throw new RoomNotFoundException();
             }
-            else
-                throw new InvalidInputException();
-        }
-        else
-            throw new ObjectAlreadyExistsException();
+        } else throw new PositionAlreadyExistsException();
+    }
+
+    private boolean checkIfPositionExists(Position positionToValidate) {
+        return positionRepository.findByNumberOfPosition(positionToValidate.getNumberOfPosition(),positionToValidate.getRoom().getId()).isPresent();
     }
 
     public void updatePosition(PositionData positionInput) throws EmailExistException, PositionNotFoundException, RoomNotFoundException, InvalidInputException {
