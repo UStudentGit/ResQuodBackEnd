@@ -1,7 +1,7 @@
 package com.ustudent.resquod.controller;
 
 
-
+import com.ustudent.resquod.model.dao.NewRoomData;
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
@@ -31,8 +31,8 @@ public class RoomController {
             @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Room Already Exists\" or \"Permission Denied"),
             @ApiResponse( code = 404, message = "Corporation Does Not Exist")})
     @PostMapping("/room")
-    public ResponseTransfer addNewRoom(@ApiParam(value = "Required name, corporation", required = true)
-                                           @RequestBody Room newRoom) {
+    public ResponseTransfer addNewRoom(@ApiParam(value = "Required name, corporation id", required = true)
+                                           @RequestBody NewRoomData newRoom) {
         try {
             roomService.addNewRoom(newRoom);
         } catch (RoomAlreadyExistsException exception) {

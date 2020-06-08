@@ -1,5 +1,7 @@
 package com.ustudent.resquod.controller;
 
+
+import com.ustudent.resquod.model.dao.NewEventData;
 import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.exception.ObjectNotFoundException;
@@ -84,7 +86,7 @@ public class EventController {
             @ApiResponse( code = 404, message = "Room Does Not Exist")})
     @PostMapping("/event")
     public ResponseTransfer addNewEvent(@ApiParam(value = "Required name, password, room id", required = true)
-                                            @RequestBody Event newEvent) {
+                                            @RequestBody NewEventData newEvent) {
         try {
             eventService.addNewEvent(newEvent);
         } catch (EventAlreadyExistsException e) {
