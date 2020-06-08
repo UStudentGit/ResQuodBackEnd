@@ -39,6 +39,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/test1").permitAll()
                 .antMatchers("/test2", "/adminEvents").authenticated()
                 .antMatchers("/test3").hasRole("ADMIN")
+                .antMatchers("/corpoRegister", "/allEvents", "/allCorpos").hasAnyAuthority("ROLE_ADMIN")
                 .antMatchers("/positionPatch").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER")
                 .antMatchers("/addUser").hasAnyAuthority("ROLE_ADMIN", "ROLE_OWNER")
                 .and().addFilter(new JwtFilter(authenticationManager()))
