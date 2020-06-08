@@ -2,6 +2,7 @@ package com.ustudent.resquod.controller;
 
 import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.exception.*;
+import com.ustudent.resquod.exception.ObjectNotFoundException;
 import com.ustudent.resquod.model.dao.EventDTO;
 import com.ustudent.resquod.model.dao.EventData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;

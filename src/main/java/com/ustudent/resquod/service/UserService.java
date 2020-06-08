@@ -42,16 +42,13 @@ public class UserService {
         return userRepository.findUserPassword(email).orElseThrow(EmailExistException::new);
     }
 
-    public User getUserByEmail(String email)throws EmailExistException{
-        return userRepository.findByEmail(email).orElseThrow(EmailExistException::new);
-
-    }
-    public UserData getUser(String email) throws EmailExistException {
-        return userRepository.findUserData(email).orElseThrow(EmailExistException::new);
-    }
-
     public User getUserByEmail(String email) throws EmailExistException {
         return userRepository.findByEmail(email).orElseThrow(EmailExistException::new);
+
+    }
+
+    public UserData getUser(String email) throws EmailExistException {
+        return userRepository.findUserData(email).orElseThrow(EmailExistException::new);
     }
 
 
@@ -86,16 +83,16 @@ public class UserService {
 
     public void updateUserData(RegisterUserData userInput) throws InvalidPasswordException, InvalidInputException {
         if (userInput.getPassword() == null || userInput.getPassword().length() < 6
-                  || userInput.getPassword().length() > 32)
+                || userInput.getPassword().length() > 32)
             throw new InvalidInputException();
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User user = userRepository.findByEmail(email).get();
         verifyPassword(userInput.getPassword(), user.getPassword());
-        if((userInput.getName().equals(user.getName()) && userInput.getSurname().equals(user.getSurname())
-        && userInput.getEmail().equals(user.getEmail()))
-                || userInput.getEmail() == null ||userInput.getEmail().length() < 2
-                || !userInput.getEmail().contains("@") ||   userInput.getPassword() == null
-                ||userInput.getName() == null || userInput.getName().length() < 2 ||
+        if ((userInput.getName().equals(user.getName()) && userInput.getSurname().equals(user.getSurname())
+                && userInput.getEmail().equals(user.getEmail()))
+                || userInput.getEmail() == null || userInput.getEmail().length() < 2
+                || !userInput.getEmail().contains("@") || userInput.getPassword() == null
+                || userInput.getName() == null || userInput.getName().length() < 2 ||
                 userInput.getSurname() == null || userInput.getSurname().length() < 2
         )
             throw new InvalidInputException();
