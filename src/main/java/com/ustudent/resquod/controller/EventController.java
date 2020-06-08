@@ -14,6 +14,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
 import java.util.Set;
 
 
@@ -99,5 +101,18 @@ public class EventController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
         }
         return new ResponseTransfer("Event Added Successfully");
+    }
+
+    @ApiOperation(value = "Returns all Events", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 403, message = "You Have no permission"),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @GetMapping(value = "/allEvents")
+    public List<EventDTO> showAllEvents() {
+        try {
+            return eventService.showEveryEvent();
+        } catch (EmailExistException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+        }
     }
 }

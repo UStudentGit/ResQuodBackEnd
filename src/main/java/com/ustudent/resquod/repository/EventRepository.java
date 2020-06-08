@@ -4,6 +4,8 @@ import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.model.dao.EventDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import java.util.List;
 import java.util.Set;
 import java.util.Optional;
 
@@ -15,6 +17,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<String> findByPassword(String password);
 
+    List<Event> findAll();
 
     @Query(value = "SELECT new com.ustudent.resquod.model.dao.EventDTO(e.id,e.name,e.administratorId,e.password,r.id,r.name) " +
             "FROM  Event e JOIN Room r ON r.id=e.room.id  " +

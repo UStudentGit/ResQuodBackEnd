@@ -14,7 +14,10 @@ import com.ustudent.resquod.repository.EventRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -78,6 +81,15 @@ public class EventService {
             eventsU.add(new EventDTO(e.getId(),e.getName(),e.getAdministratorId(),e.getPassword(),e.getRoom().getId(),e.getRoom().getName()));
         }
     return eventsU;
+    }
+
+    public List<EventDTO> showEveryEvent() {
+        List<Event> events = eventRepository.findAll();
+        List<EventDTO> allEvents = new ArrayList<>();
+        for (Event e: events){
+            allEvents.add(new EventDTO(e.getId(),e.getName(),e.getAdministratorId(),e.getPassword(),e.getRoom().getId(),e.getRoom().getName()));
+        }
+        return allEvents;
     }
 
     public void changeEventData(EventData inputData) throws InvalidInputException, ObjectNotFoundException {
