@@ -7,6 +7,6 @@ import org.springframework.stereotype.Component;
 public class CorporationValidator {
 
     public boolean validateCorporation(Corporation corporationToValidate){
-        return !corporationToValidate.getName().isEmpty() && corporationToValidate.getName() != null;
+        return corporationToValidate.getName() != null && !corporationToValidate.getName().isEmpty();
     }
 }

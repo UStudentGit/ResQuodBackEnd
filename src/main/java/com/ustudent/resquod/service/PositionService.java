@@ -37,10 +37,8 @@ public class PositionService {
         if(!checkIfPositionExists(newPosition)) {
             if(positionValidator.validatePosition(newPosition)) {
                 Room tempRoom = roomService.getRoomById(newPosition.getRoom());
-                if (tempRoom != null) {
-                    newPosition.setRoom(tempRoom);
-                    positionRepository.save(newPosition);
-                } else throw new RoomNotFoundException();
+                newPosition.setRoom(tempRoom);
+                positionRepository.save(newPosition);
             }
         } else throw new PositionAlreadyExistsException();
     }

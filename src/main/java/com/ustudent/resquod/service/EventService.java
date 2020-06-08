@@ -28,10 +28,8 @@ public class EventService {
         if(!checkIfEventExists(newEvent)) {
             eventValidator.validateEvent(newEvent);
             Room tempRoom = roomService.getRoomById(newEvent.getRoom());
-            if (tempRoom != null) {
-                newEvent.setRoom(tempRoom);
-                eventRepository.save(newEvent);
-            } else throw new RoomNotFoundException();
+            newEvent.setRoom(tempRoom);
+            eventRepository.save(newEvent);
         } else throw new EventAlreadyExistsException();
     }
 
