@@ -6,6 +6,7 @@ import com.ustudent.resquod.model.Corporation;
 import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.dao.NewEventData;
 import com.ustudent.resquod.repository.EventRepository;
 import com.ustudent.resquod.validator.EventValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,11 @@ public class EventService {
         this.userService=userService;
     }
 
-    public void addNewEvent(Event newEvent) throws EventAlreadyExistsException, PermissionDeniedException {
+    public void addNewEvent(NewEventData newEvent) throws EventAlreadyExistsException, PermissionDeniedException {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User admin = userService.getUserByEmail(email);
-        Corporation corporation = roomService.getRoomById(newEvent.getRoom()).getCorporation();
+        Corporation corporation = roomService.getRoomById(newEvent.getRoomId()).getCorporation();
 
         if (!(admin.getRole().equals("ROLE_ADMIN") ||
                 (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
@@ -43,14 +44,17 @@ public class EventService {
 
         if (!checkIfEventExists(newEvent)) {
             eventValidator.validateEvent(newEvent);
-            newEvent.setAdministratorId(admin.getId());
-            Room tempRoom = roomService.getRoomById(newEvent.getRoom());
-            newEvent.setRoom(tempRoom);
-            eventRepository.save(newEvent);
+            Event event = new Event();
+            event.setAdministratorId(admin.getId());
+            Room room = roomService.getRoomById(newEvent.getRoomId());
+            event.setName(newEvent.getName());
+            event.setPassword(newEvent.getPassword());
+            event.setRoom(room);
+            eventRepository.save(event);
         } else throw new EventAlreadyExistsException();
     }
 
-    private boolean checkIfEventExists(Event newEvent) {
-        return eventRepository.findByName(newEvent.getName(),newEvent.getRoom().getId()).isPresent();
+    private boolean checkIfEventExists(NewEventData newEvent) {
+        return eventRepository.findByName(newEvent.getName(),newEvent.getRoomId()).isPresent();
     }
 }

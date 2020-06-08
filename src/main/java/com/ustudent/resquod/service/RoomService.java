@@ -6,6 +6,7 @@ import com.ustudent.resquod.exception.RoomNotFoundException;
 import com.ustudent.resquod.model.Corporation;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.dao.NewRoomData;
 import com.ustudent.resquod.repository.RoomRepository;
 import com.ustudent.resquod.validator.RoomValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,11 +32,11 @@ public class RoomService {
         this.userService=userService;
     }
 
-    public void addNewRoom(Room newRoom) throws RoomAlreadyExistsException, PermissionDeniedException {
+    public void addNewRoom(NewRoomData newRoom) throws RoomAlreadyExistsException, PermissionDeniedException {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User admin = userService.getUserByEmail(email);
-        Corporation corporation = corporationService.getCorpoById(newRoom.getCorporation());
+        Corporation corporation = corporationService.getCorpoById(newRoom.getCorporationId());
 
         if (!(admin.getRole().equals("ROLE_ADMIN") ||
                 (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
@@ -43,17 +44,19 @@ public class RoomService {
 
         if(!checkIfRoomExists(newRoom)) {
             if(roomValidator.validateRoom(newRoom)) {
-                newRoom.setCorporation(corporation);
-                roomRepository.save(newRoom);
+                Room room = new Room();
+                room.setName(newRoom.getName());
+                room.setCorporation(corporation);
+                roomRepository.save(room);
             }
         } else throw new RoomAlreadyExistsException();
     }
 
-    public boolean checkIfRoomExists(Room roomToValidate) {
+    public boolean checkIfRoomExists(NewRoomData roomToValidate) {
         return roomRepository.findByName(roomToValidate.getName()).isPresent();
     }
 
-    public Room getRoomById(Room roomToValidate) {
-        return roomRepository.findById(roomToValidate.getId()).orElseThrow(RoomNotFoundException::new);
+    public Room getRoomById(Long roomId) {
+        return roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
     }
 }

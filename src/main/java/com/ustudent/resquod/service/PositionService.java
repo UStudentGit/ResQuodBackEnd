@@ -5,6 +5,7 @@ import com.ustudent.resquod.model.Corporation;
 import com.ustudent.resquod.model.Position;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.dao.NewPositionData;
 import com.ustudent.resquod.model.dao.PositionData;
 import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.repository.PositionRepository;
@@ -37,11 +38,11 @@ public class PositionService {
         this.userService=userService;
     }
 
-    public void addNewPosition(Position newPosition) throws PositionAlreadyExistsException, PermissionDeniedException {
+    public void addNewPosition(NewPositionData newPosition) throws PositionAlreadyExistsException, PermissionDeniedException {
 
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User admin = userService.getUserByEmail(email);
-        Corporation corporation = roomService.getRoomById(newPosition.getRoom()).getCorporation();
+        Corporation corporation = roomService.getRoomById(newPosition.getRoomId()).getCorporation();
 
         if (!(admin.getRole().equals("ROLE_ADMIN") ||
                 (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
@@ -49,15 +50,18 @@ public class PositionService {
 
         if(!checkIfPositionExists(newPosition)) {
             if(positionValidator.validatePosition(newPosition)) {
-                Room tempRoom = roomService.getRoomById(newPosition.getRoom());
-                newPosition.setRoom(tempRoom);
-                positionRepository.save(newPosition);
+                Room room = roomService.getRoomById(newPosition.getRoomId());
+                Position position = new Position();
+                position.setNumberOfPosition(newPosition.getNumberOfPosition());
+                position.setRoom(room);
+                position.setTagId(null);
+                positionRepository.save(position);
             }
         } else throw new PositionAlreadyExistsException();
     }
 
-    private boolean checkIfPositionExists(Position positionToValidate) {
-        return positionRepository.findByNumberOfPosition(positionToValidate.getNumberOfPosition(),positionToValidate.getRoom().getId()).isPresent();
+    private boolean checkIfPositionExists(NewPositionData positionToValidate) {
+        return positionRepository.findByNumberOfPosition(positionToValidate.getNumberOfPosition(),positionToValidate.getRoomId()).isPresent();
     }
 
     public void updatePosition(PositionData positionInput) throws EmailExistException, PositionNotFoundException, RoomNotFoundException, InvalidInputException {

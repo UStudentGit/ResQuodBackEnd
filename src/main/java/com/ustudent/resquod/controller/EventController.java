@@ -4,7 +4,7 @@ import com.ustudent.resquod.exception.EventAlreadyExistsException;
 import com.ustudent.resquod.exception.InvalidInputException;
 import com.ustudent.resquod.exception.PermissionDeniedException;
 import com.ustudent.resquod.exception.RoomNotFoundException;
-import com.ustudent.resquod.model.Event;
+import com.ustudent.resquod.model.dao.NewEventData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.service.EventService;
 import io.swagger.annotations.*;
@@ -30,7 +30,7 @@ public class EventController {
             @ApiResponse( code = 404, message = "Room Does Not Exist")})
     @PostMapping("/event")
     public ResponseTransfer addNewEvent(@ApiParam(value = "Required name, password, room id", required = true)
-                                            @RequestBody Event newEvent) {
+                                            @RequestBody NewEventData newEvent) {
         try {
             eventService.addNewEvent(newEvent);
         } catch (EventAlreadyExistsException e) {

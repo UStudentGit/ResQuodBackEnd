@@ -2,6 +2,7 @@ package com.ustudent.resquod.controller;
 
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.Position;
+import com.ustudent.resquod.model.dao.NewPositionData;
 import com.ustudent.resquod.model.dao.PositionData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.service.PositionService;
@@ -28,9 +29,8 @@ public class PositionController {
             @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Possition Already Exists\" or \"Id Tag Already Exists\" or \"Permission Denied\""),
             @ApiResponse( code = 404, message = "Room Does Not Exist")})
     @PostMapping("/position")
-    public ResponseTransfer addNewPosition(@ApiParam(value = "Required number of position, room id", required = true,
-            examples = @Example(value = {@ExampleProperty(value = "{'numberOfPosition': Integer, 'room': {'id': Long}}", mediaType = "application/json")}))
-                                               @RequestBody Position newPosition) {
+    public ResponseTransfer addNewPosition(@ApiParam(value = "Required number of position, room id", required = true)
+                                               @RequestBody NewPositionData newPosition) {
         try {
             positionService.addNewPosition(newPosition);
         } catch (PositionAlreadyExistsException exception) {
@@ -53,7 +53,7 @@ public class PositionController {
             @ApiResponse(code = 500, message = "Server Error!")})
     @PatchMapping("/positionPatch")
     public ResponseTransfer changePositionData(
-            @ApiParam(value = "Required id, numberOfPosition, tagId, room_id", required = true)
+            @ApiParam(value = "Required number of position, room id", required = true)
             @RequestBody PositionData positionInput) {
         try {
             positionService.updatePosition(positionInput);
