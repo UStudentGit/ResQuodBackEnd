@@ -1,15 +1,14 @@
 package com.ustudent.resquod.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import javax.persistence.*;
-import java.time.DayOfWeek;
-import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name = "events")
+@Table(name = "events",indexes = @Index(columnList = "password"))
 public class Event {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,13 +16,25 @@ public class Event {
     private String name;
     private Long administratorId;
     private String password;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.ALL})
     private Room room;
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "Events_Users",
             joinColumns = @JoinColumn(name = "events_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private final Set<User> users = new HashSet<>();
+
+    private  Set<User> users = new HashSet<>();
+
+    public Event() { }
+
+    public Event(Long id, String name, Long administratorId, String password, Room room, Set<User> users) {
+        this.id = id;
+        this.name = name;
+        this.administratorId = administratorId;
+        this.password = password;
+        this.room = room;
+        this.users = users;
+    }
 
     public Long getId() {
         return id;
@@ -40,6 +51,7 @@ public class Event {
     public void setName(String name) {
         this.name = name;
     }
+
     public Room getRoom() {
         return room;
     }

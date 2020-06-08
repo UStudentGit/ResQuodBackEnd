@@ -21,10 +21,16 @@ import org.springframework.stereotype.Service;
 @Configurable(preConstruction = true, autowire = Autowire.BY_NAME)
 public class UserService {
 
-    @Autowired
+
     private UserRepository userRepository;
-    @Autowired
+
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public void validateLoginData(LoginUserData userInput) {
         if (userInput.getEmail() == null || userInput.getPassword() == null ||
@@ -36,6 +42,10 @@ public class UserService {
         return userRepository.findUserPassword(email).orElseThrow(EmailExistException::new);
     }
 
+    public User getUserByEmail(String email)throws EmailExistException{
+        return userRepository.findByEmail(email).orElseThrow(EmailExistException::new);
+
+    }
     public UserData getUser(String email) throws EmailExistException {
         return userRepository.findUserData(email).orElseThrow(EmailExistException::new);
     }
@@ -74,25 +84,20 @@ public class UserService {
         return true;
     }
 
-    public void validateUserData(RegisterUserData userInput) throws InvalidInputException {
-        if (userInput.getEmail() == null || userInput.getEmail().length() < 2 ||
-                !userInput.getEmail().contains("@") ||
-                userInput.getPassword() == null ||
-                userRepository.findByEmail(userInput.getEmail()).isEmpty() ||
-                userInput.getName() == null || userInput.getName().length() < 2 ||
-                userInput.getSurname() == null || userInput.getSurname().length() < 2)
-            throw new InvalidInputException();
-    }
-
     public void updateUserData(RegisterUserData userInput) throws InvalidPasswordException, InvalidInputException {
         if (userInput.getPassword() == null || userInput.getPassword().length() < 6
                   || userInput.getPassword().length() > 32)
             throw new InvalidInputException();
-        User user = userRepository.findByEmail(userInput.getEmail()).get();
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User user = userRepository.findByEmail(email).get();
         verifyPassword(userInput.getPassword(), user.getPassword());
-        if(userInput.getName().equals(user.getName()) || userInput.getSurname().equals(user.getSurname())
-        || userInput.getEmail().equals(user.getEmail())
-                 || userInput.getEmail() == null)
+        if((userInput.getName().equals(user.getName()) && userInput.getSurname().equals(user.getSurname())
+        && userInput.getEmail().equals(user.getEmail()))
+                || userInput.getEmail() == null ||userInput.getEmail().length() < 2
+                || !userInput.getEmail().contains("@") ||   userInput.getPassword() == null
+                ||userInput.getName() == null || userInput.getName().length() < 2 ||
+                userInput.getSurname() == null || userInput.getSurname().length() < 2
+        )
             throw new InvalidInputException();
         user.setName(userInput.getName());
         user.setSurname(userInput.getSurname());

@@ -11,7 +11,7 @@ public class AttendanceList {
     private Long id;
     private String name;
     private LocalDateTime createTime;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.ALL})
     private Event event;
 
 
