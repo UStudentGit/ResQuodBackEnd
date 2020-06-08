@@ -1,13 +1,11 @@
 package com.ustudent.resquod.model;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
-@Table(name="corporations")
+@Table(name = "corporations")
 public class Corporation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,10 +24,11 @@ public class Corporation {
         this.name = name;
     }
 
-    public void addUser(User user){
+    public void addUser(User user) {
         users.add(user);
         user.getCorporations().add(this);
     }
+
     public Long getId() {
         return id;
     }
