@@ -16,7 +16,7 @@ public class CorporationService {
         this.corporationRepository=corporationRepository;
     }
 
-    public Corporation getCorpoById(Corporation corporationToValidate) {
-        return corporationRepository.findById(corporationToValidate.getId()).orElseThrow(CorporationNotFoundException::new);
+    public Corporation getCorpoById(Corporation corporation) {
+        return corporationRepository.findById(corporation.getId()).orElseThrow(CorporationNotFoundException::new);
     }
 }

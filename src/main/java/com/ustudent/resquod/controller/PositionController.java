@@ -23,12 +23,14 @@ public class PositionController {
         this.positionService = positionService;
     }
 
-    @ApiOperation(value = "Add New Position")
-    @ApiResponses(value = { @ApiResponse(code = 200, message = "Position Added Succesfully."),
-            @ApiResponse(code = 400, message = "\"Invalid Input.\" or \"Possition Already Exists.\" or \"Id Tag Already Exists.\""),
-            @ApiResponse( code = 404, message = "Room Does Not Exist.")})
-    @RequestMapping(method = RequestMethod.POST, value = "/position")
-    public ResponseTransfer addNewPosition(@ApiParam(value = "Required Number Of Position, Room")@RequestBody Position newPosition) {
+    @ApiOperation(value = "Add New Position", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Position Added Succesfully"),
+            @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Possition Already Exists\" or \"Id Tag Already Exists\" or \"Permission Denied\""),
+            @ApiResponse( code = 404, message = "Room Does Not Exist")})
+    @PostMapping("/position")
+    public ResponseTransfer addNewPosition(@ApiParam(value = "Required number of position, room id", required = true,
+            examples = @Example(value = {@ExampleProperty(value = "{'numberOfPosition': Integer, 'room': {'id': Long}}", mediaType = "application/json")}))
+                                               @RequestBody Position newPosition) {
         try {
             positionService.addNewPosition(newPosition);
         } catch (PositionAlreadyExistsException exception) {
@@ -39,6 +41,8 @@ public class PositionController {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room Does Not Exist");
         } catch (DataIntegrityViolationException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id Tag Already Exists");
+        } catch (PermissionDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
         }
         return new ResponseTransfer("Position Added Successfully");
     }

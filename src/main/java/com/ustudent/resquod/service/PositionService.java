@@ -1,8 +1,10 @@
 package com.ustudent.resquod.service;
 
 import com.ustudent.resquod.exception.*;
+import com.ustudent.resquod.model.Corporation;
 import com.ustudent.resquod.model.Position;
 import com.ustudent.resquod.model.Room;
+import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.PositionData;
 import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.repository.PositionRepository;
@@ -20,19 +22,30 @@ public class PositionService {
     private final PositionValidator positionValidator;
     private final RoomRepository roomRepository;
     private final RoomService roomService;
+    private final UserService userService;
     private final UserRepository userRepository;
 
     @Autowired
     PositionService(PositionRepository positionRepository,PositionValidator positionValidator,
-                    RoomRepository roomRepository, UserRepository userRepository,RoomService roomService) {
+                    RoomRepository roomRepository, UserRepository userRepository,RoomService roomService,
+                    UserService userService) {
         this.positionRepository=positionRepository;
         this.roomRepository=roomRepository;
         this.positionValidator=positionValidator;
         this.userRepository = userRepository;
         this.roomService=roomService;
+        this.userService=userService;
     }
 
-    public void addNewPosition(Position newPosition) throws PositionAlreadyExistsException {
+    public void addNewPosition(Position newPosition) throws PositionAlreadyExistsException, PermissionDeniedException {
+
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User admin = userService.getUserByEmail(email);
+        Corporation corporation = roomService.getRoomById(newPosition.getRoom()).getCorporation();
+
+        if (!(admin.getRole().equals("ROLE_ADMIN") ||
+                (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
+            throw new PermissionDeniedException();
 
         if(!checkIfPositionExists(newPosition)) {
             if(positionValidator.validatePosition(newPosition)) {

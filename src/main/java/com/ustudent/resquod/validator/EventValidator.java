@@ -10,7 +10,7 @@ public class EventValidator {
     public boolean validateEvent(Event eventToValidate) throws InvalidInputException {
 
         if(eventToValidate.getName() == null || eventToValidate.getName().isEmpty()
-        || eventToValidate.getRoom().getId() == null || eventToValidate.getAdministratorId() == null)
+        || eventToValidate.getRoom().getId() == null)
             throw new InvalidInputException();
         return true;
     }
