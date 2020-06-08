@@ -100,7 +100,6 @@ public class AuthorizationController {
             @ApiParam(value = "Required email, name, surname, password", required = true)
             @RequestBody RegisterUserData userInput) {
         try {
-            userService.validateUserData(userInput);
             userService.updateUserData(userInput);
         } catch (InvalidInputException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid input!");
