@@ -12,7 +12,6 @@ public class Room {
     @ManyToOne(fetch = FetchType.LAZY)
     private Corporation corporation;
 
-
     public Long getId() {
         return id;
     }
@@ -21,9 +20,7 @@ public class Room {
         this.id = id;
     }
 
-    public String getName() {
-        return name;
-    }
+    public String getName() { return name; }
 
     public void setName(String name) {
         this.name = name;

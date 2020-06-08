@@ -17,9 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.validation.constraints.Null;
-import java.util.Optional;
-
 @Service
 @Configurable(preConstruction = true, autowire = Autowire.BY_NAME)
 public class UserService {
@@ -51,6 +48,10 @@ public class UserService {
     }
     public UserData getUser(String email) throws EmailExistException {
         return userRepository.findUserData(email).orElseThrow(EmailExistException::new);
+    }
+
+    public User getUserByEmail(String email) throws EmailExistException {
+        return userRepository.findByEmail(email).orElseThrow(EmailExistException::new);
     }
 
 

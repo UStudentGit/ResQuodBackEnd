@@ -1,15 +1,16 @@
 package com.ustudent.resquod.service;
 
 import com.ustudent.resquod.exception.*;
+import com.ustudent.resquod.model.Corporation;
 import com.ustudent.resquod.model.Position;
 import com.ustudent.resquod.model.Room;
+import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.PositionData;
 import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.repository.PositionRepository;
 import com.ustudent.resquod.repository.RoomRepository;
 import com.ustudent.resquod.repository.UserRepository;
 import com.ustudent.resquod.validator.PositionValidator;
-import com.ustudent.resquod.validator.RoomValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -17,38 +18,46 @@ import org.springframework.stereotype.Service;
 @Service
 public class PositionService {
 
-    private PositionRepository positionRepository;
-    private PositionValidator positionValidator;
-    private RoomRepository roomRepository;
-    private RoomValidator roomValidator;
-    private UserRepository userRepository;
+    private final PositionRepository positionRepository;
+    private final PositionValidator positionValidator;
+    private final RoomRepository roomRepository;
+    private final RoomService roomService;
+    private final UserService userService;
+    private final UserRepository userRepository;
 
     @Autowired
     PositionService(PositionRepository positionRepository,PositionValidator positionValidator,
-                    RoomRepository roomRepository,RoomValidator roomValidator, UserRepository userRepository) {
+                    RoomRepository roomRepository, UserRepository userRepository,RoomService roomService,
+                    UserService userService) {
         this.positionRepository=positionRepository;
         this.roomRepository=roomRepository;
-        this.roomValidator=roomValidator;
         this.positionValidator=positionValidator;
         this.userRepository = userRepository;
+        this.roomService=roomService;
+        this.userService=userService;
     }
 
-    public void addNewPosition(Position newPosition) throws ObjectAlreadyExistsException, InvalidInputException, ObjectNotFoundException {
+    public void addNewPosition(Position newPosition) throws PositionAlreadyExistsException, PermissionDeniedException {
 
-        if(positionValidator.checkIfPositionExists(newPosition)) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User admin = userService.getUserByEmail(email);
+        Corporation corporation = roomService.getRoomById(newPosition.getRoom()).getCorporation();
+
+        if (!(admin.getRole().equals("ROLE_ADMIN") ||
+                (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
+            throw new PermissionDeniedException();
+
+        if(!checkIfPositionExists(newPosition)) {
             if(positionValidator.validatePosition(newPosition)) {
-                if (!roomValidator.checkIfRoomExists(newPosition.getRoom())) {
-                    newPosition.setRoom(roomRepository.findByName(newPosition.getRoom().getName()).get());
-                    positionRepository.save(newPosition);
-                } else {
-                    throw new ObjectNotFoundException();
-                }
+                Room tempRoom = roomService.getRoomById(newPosition.getRoom());
+                newPosition.setRoom(tempRoom);
+                positionRepository.save(newPosition);
             }
-            else
-                throw new InvalidInputException();
-        }
-        else
-            throw new ObjectAlreadyExistsException();
+        } else throw new PositionAlreadyExistsException();
+    }
+
+    private boolean checkIfPositionExists(Position positionToValidate) {
+        return positionRepository.findByNumberOfPosition(positionToValidate.getNumberOfPosition(),positionToValidate.getRoom().getId()).isPresent();
     }
 
     public void updatePosition(PositionData positionInput) throws EmailExistException, PositionNotFoundException, RoomNotFoundException, InvalidInputException {

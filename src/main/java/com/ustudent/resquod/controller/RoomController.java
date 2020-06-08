@@ -1,5 +1,7 @@
 package com.ustudent.resquod.controller;
 
+
+
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
@@ -10,25 +12,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
 import java.util.Set;
 
+
 @RestController
+@Api(value="Room Management")
 public class RoomController {
 
-    @Autowired
-    RoomService roomService;
+    private final RoomService roomService;
 
-    @RequestMapping(method= RequestMethod.POST, value = "/newRoom")
-    public String addNewRoom(@RequestBody Room newRoom) {
+    @Autowired
+    public RoomController(RoomService roomService) {
+        this.roomService=roomService;
+    }
+
+    @ApiOperation(value = "Add New Room", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Room Added Succesfully"),
+            @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Room Already Exists\" or \"Permission Denied"),
+            @ApiResponse( code = 404, message = "Corporation Does Not Exist")})
+    @PostMapping("/room")
+    public ResponseTransfer addNewRoom(@ApiParam(value = "Required name, corporation", required = true)
+                                           @RequestBody Room newRoom) {
         try {
             roomService.addNewRoom(newRoom);
-        } catch (ObjectAlreadyExistsException exception) {
-            return "Room already exists";
+        } catch (RoomAlreadyExistsException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room Already Exists");
         } catch (InvalidInputException exception) {
-            return "Invalid input.";
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Input");
+        } catch (CorporationNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Corporation Does Not Exist");
+        } catch (PermissionDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
         }
-        return "Brand added successfully";
+        return new ResponseTransfer("Room Added Successfully");
     }
 
     @ApiOperation(value = "Returns corporation rooms list", authorizations = {@Authorization(value = "authkey")})
@@ -67,3 +83,4 @@ public class RoomController {
 
 
 }
+

@@ -4,9 +4,10 @@ import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.model.dao.EventDTO;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-
-import java.util.Optional;
 import java.util.Set;
+import java.util.Optional;
+
+
 
 public interface EventRepository extends JpaRepository<Event, Long> {
 
@@ -20,6 +21,10 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "WHERE e.administratorId = ?1")
     Set<EventDTO> findByAdministratorId(Long id);
 
+    @Query(value = "SELECT e FROM Event e " +
+            "LEFT JOIN Room r ON r.id = e.room.id " +
+            "where e.name = ?1 and e.room.id = ?2")
+    Optional<Event> findByName(String name, Long roomId);
 
 
 }
