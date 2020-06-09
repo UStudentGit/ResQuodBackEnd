@@ -13,6 +13,9 @@ public class UserData {
         this.surname = surname;
     }
 
+    public UserData() {
+    }
+
     public String getEmail() {
         return email;
     }

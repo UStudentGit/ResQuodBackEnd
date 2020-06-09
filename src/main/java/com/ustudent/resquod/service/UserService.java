@@ -1,14 +1,8 @@
 package com.ustudent.resquod.service;
 
-import com.ustudent.resquod.exception.EmailExistException;
-import com.ustudent.resquod.exception.InvalidInputException;
-import com.ustudent.resquod.exception.InvalidPasswordException;
-import com.ustudent.resquod.exception.PasswordMatchedException;
+import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.User;
-import com.ustudent.resquod.model.dao.LoginUserData;
-import com.ustudent.resquod.model.dao.RegisterUserData;
-import com.ustudent.resquod.model.dao.UserData;
-import com.ustudent.resquod.model.dao.UserPassword;
+import com.ustudent.resquod.model.dao.*;
 import com.ustudent.resquod.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowire;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +16,15 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
 
-    private UserRepository userRepository;
-
-    private PasswordEncoder passwordEncoder;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
 
     @Autowired
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, JwtService jwtService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.jwtService = jwtService;
     }
 
     public void validateLoginData(LoginUserData userInput) {
@@ -91,7 +86,7 @@ public class UserService {
                 || userInput.getPassword().length() > 32)
             throw new InvalidInputException();
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userRepository.findByEmail(email).get();
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         verifyPassword(userInput.getPassword(), user.getPassword());
         if ((userInput.getName().equals(user.getName()) && userInput.getSurname().equals(user.getSurname())
                 && userInput.getEmail().equals(user.getEmail()))
@@ -113,12 +108,22 @@ public class UserService {
                 || userInput.getNewPassword().length() > 32 || userInput.getOldPassword().length() > 32)
             throw new InvalidInputException();
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User user = userRepository.findByEmail(email).get();
+        User user = userRepository.findByEmail(email).orElseThrow(UserNotFoundException::new);
         if (userInput.getNewPassword().equals(userInput.getOldPassword())) {
             throw new PasswordMatchedException();
         }
         verifyPassword(userInput.getOldPassword(), user.getPassword());
         user.setPassword(hashPassword(userInput.getNewPassword()));
         userRepository.save(user);
+    }
+
+    public TokenTransfer login(LoginUserData userInput) {
+        this.validateLoginData(userInput);
+        LoginUserData loginUserData;
+        loginUserData = this.getUserDataIfExist(userInput.getEmail());
+        this.verifyPassword(userInput.getPassword(), loginUserData.getPassword());
+        String token = jwtService.sign(loginUserData.getEmail(), loginUserData.getRole());
+        UserData userData = userRepository.findUserData(loginUserData.getEmail()).orElseThrow(ObjectNotFoundException::new);
+        return new TokenTransfer(token, userData);
     }
 }

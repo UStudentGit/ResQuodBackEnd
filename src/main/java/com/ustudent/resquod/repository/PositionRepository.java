@@ -19,4 +19,6 @@ public interface PositionRepository extends JpaRepository<Position,Long> {
             "JOIN c.users u " +
             "WHERE p.id = ?1 AND u.email = ?2")
     Optional<Position> findByIdAndEmail(Long id, String email);
+
+    Optional<Position> findByTagId(String TagId);
 }
