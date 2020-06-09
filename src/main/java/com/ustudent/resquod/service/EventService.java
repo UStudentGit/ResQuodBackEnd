@@ -41,8 +41,7 @@ public class EventService {
 
     public void addNewEvent(NewEventData newEvent) throws EventAlreadyExistsException, PermissionDeniedException {
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User admin = userService.getUserByEmail(email);
+        User admin = userService.getLoggedUser();
         Corporation corporation = roomService.getRoomById(newEvent.getRoomId()).getCorporation();
 
         if (!(admin.getRole().equals("ROLE_ADMIN") ||

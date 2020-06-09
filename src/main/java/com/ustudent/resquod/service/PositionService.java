@@ -40,8 +40,7 @@ public class PositionService {
 
     public void addNewPosition(NewPositionData newPosition) throws PositionAlreadyExistsException, PermissionDeniedException {
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User admin = userService.getUserByEmail(email);
+        User admin = userService.getLoggedUser();
         Corporation corporation = roomService.getRoomById(newPosition.getRoomId()).getCorporation();
 
         if (!(admin.getRole().equals("ROLE_ADMIN") ||

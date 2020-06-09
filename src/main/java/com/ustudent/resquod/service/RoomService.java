@@ -42,8 +42,7 @@ public class RoomService {
 
     public void addNewRoom(NewRoomData newRoom) throws RoomAlreadyExistsException, PermissionDeniedException {
 
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        User admin = userService.getUserByEmail(email);
+        User admin = userService.getLoggedUser();
         Corporation corporation = corporationService.getCorpoById(newRoom.getCorporationId());
 
         if (!(admin.getRole().equals("ROLE_ADMIN") ||
