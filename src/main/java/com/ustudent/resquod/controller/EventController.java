@@ -1,13 +1,10 @@
 package com.ustudent.resquod.controller;
 
 
-import com.ustudent.resquod.model.dao.NewEventData;
+import com.ustudent.resquod.model.dao.*;
 import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.exception.ObjectNotFoundException;
-import com.ustudent.resquod.model.dao.EventDTO;
-import com.ustudent.resquod.model.dao.EventData;
-import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.service.EventService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,6 +110,19 @@ public class EventController {
             return eventService.showEveryEvent();
         } catch (EmailExistException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
+        }
+    }
+
+    @ApiOperation(value = "Returns Corporation's Events", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Corporation events:"),
+            @ApiResponse(code = 400, message = "Permission Denied")})
+    @PostMapping(value = "/corpotationsEvents")
+    public List<EventData> getCorpoEvents(@ApiParam(value = "Required corporation id", required = true)
+                                          @RequestBody CorpoData corpoId) {
+        try {
+            return eventService.findByCorpoId(corpoId.getId());
+        } catch (PermissionDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
         }
     }
 }

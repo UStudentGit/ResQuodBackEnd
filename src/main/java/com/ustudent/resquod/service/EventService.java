@@ -5,6 +5,7 @@ import com.ustudent.resquod.model.Corporation;
 import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.dao.CorpoData;
 import com.ustudent.resquod.model.dao.NewEventData;
 import com.ustudent.resquod.repository.EventRepository;
 import com.ustudent.resquod.validator.EventValidator;
@@ -15,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -27,16 +29,19 @@ public class EventService {
     private final EventRepository eventRepository;
     private final RoomService roomService;
     private final UserService userService;
+    private final CorporationService corporationService;
 
     @Autowired
     public EventService(EventValidator eventValidator,
                         EventRepository eventRepository,
                         RoomService roomService,
-                        UserService userService) {
+                        UserService userService,
+                        CorporationService corporationService) {
         this.eventValidator=eventValidator;
         this.eventRepository=eventRepository;
         this.roomService=roomService;
         this.userService=userService;
+        this.corporationService=corporationService;
     }
 
     public void addNewEvent(NewEventData newEvent) throws EventAlreadyExistsException, PermissionDeniedException {
@@ -64,7 +69,7 @@ public class EventService {
         return eventRepository.findByName(newEvent.getName(),newEvent.getRoomId()).isPresent();
     }
     
-      public Set<EventDTO> findEventsWhereUserIsAdmin(){
+    public Set<EventDTO> findEventsWhereUserIsAdmin(){
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         User user = userService.getUserByEmail(email);
         Set<EventDTO> events = eventRepository.findByAdministratorId(user.getId());
@@ -111,5 +116,22 @@ public class EventService {
         event.setRoom(room);
         eventRepository.save(event);
 
+    }
+
+    public List<EventData> findByCorpoId(Long corpoId) throws PermissionDeniedException {
+
+        User admin = userService.getLoggedUser();
+        Corporation corporation = corporationService.getCorpoById(corpoId);
+
+        if (!(admin.getRole().equals("ROLE_ADMIN") ||
+                (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
+            throw new PermissionDeniedException();
+
+        List<Event> events = eventRepository.findByCorpoId(corpoId);
+        List<EventData> corpoEvents = new ArrayList<>();
+        for (Event e: events){
+            corpoEvents.add(new EventData(e.getId(), e.getName(), e.getRoom().getId(), e.getPassword()));
+        }
+        return corpoEvents;
     }
 }
