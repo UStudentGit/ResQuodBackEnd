@@ -42,6 +42,11 @@ public class UserService {
         return userRepository.findUserPassword(email).orElseThrow(EmailExistException::new);
     }
 
+    public User getLoggedUser() {
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        return getUserByEmail(email);
+    }
+
     public User getUserByEmail(String email) throws EmailExistException {
         return userRepository.findByEmail(email).orElseThrow(EmailExistException::new);
 

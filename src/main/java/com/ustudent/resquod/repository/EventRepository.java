@@ -29,5 +29,8 @@ public interface EventRepository extends JpaRepository<Event, Long> {
             "where e.name = ?1 and e.room.id = ?2")
     Optional<Event> findByName(String name, Long roomId);
 
-
+    @Query(value = "SELECT e FROM Event e " +
+        "INNER JOIN Room r ON r.id = e.room.id and r.corporation.id = ?1"
+    )
+    List<Event> findByCorpoId(Long corpoId);
 }
