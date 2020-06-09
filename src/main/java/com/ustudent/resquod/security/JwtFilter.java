@@ -49,7 +49,7 @@ public class JwtFilter extends BasicAuthenticationFilter {
                 chain.doFilter(request, response);
             }
         } catch (WrongTokenException e) {
-            response.sendError(HttpStatus.BAD_REQUEST.value(), "Wrong or empty token!");
+            response.sendError(HttpStatus.UNAUTHORIZED.value(), "Wrong or empty token!");
         } catch (ServletException e) {
             response.sendError(HttpStatus.INTERNAL_SERVER_ERROR.value(), "ServletException");
         }

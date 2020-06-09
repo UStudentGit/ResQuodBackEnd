@@ -1,18 +1,24 @@
 package com.ustudent.resquod.model.dao;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.LocalDateTime;
 
 public class AttendanceListData {
+    @JsonIgnore
     private Long id;
     private String name;
-    private LocalDateTime createTime;
-    private Long event_id;
+    private Long eventId;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
 
-    public AttendanceListData(Long id, String name, LocalDateTime createTime, Long event_id){
+
+    public AttendanceListData(Long id, String name, LocalDateTime startTime, LocalDateTime endTime, Long eventId){
         this.id = id;
         this.name = name;
-        this.createTime = createTime;
-        this.event_id = event_id;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.eventId = eventId;
     }
 
     public Long getId() {
@@ -31,19 +37,27 @@ public class AttendanceListData {
         this.name = name;
     }
 
-    public Long getEventID() {
-        return event_id;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
-    public void setEventID(Long event_id) {
-        this.event_id = event_id;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
     }
 
-    public LocalDateTime getCreateTime() {
-        return createTime;
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public Long getEventId() {
+        return eventId;
+    }
+
+    public void setEventId(Long eventId) {
+        this.eventId = eventId;
     }
 }

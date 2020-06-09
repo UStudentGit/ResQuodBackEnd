@@ -10,9 +10,14 @@ public class AttendanceList {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
-    private LocalDateTime createTime;
+    private LocalDateTime startTime;
+    private LocalDateTime endTime;
+
     @ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.ALL})
     private Event event;
+
+    public AttendanceList() {
+    }
 
 
     public Long getId() {
@@ -39,11 +44,19 @@ public class AttendanceList {
         this.event = event;
     }
 
-    public LocalDateTime getCreateTime() {
-        return createTime;
+    public LocalDateTime getStartTime() {
+        return startTime;
     }
 
-    public void setCreateTime(LocalDateTime createTime) {
-        this.createTime = createTime;
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 }

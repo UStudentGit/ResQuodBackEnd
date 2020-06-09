@@ -1,10 +1,8 @@
 package com.ustudent.resquod.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -22,8 +20,12 @@ public class Event {
     @JoinTable(name = "Events_Users",
             joinColumns = @JoinColumn(name = "events_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-
     private  Set<User> users = new HashSet<>();
+
+    @OneToMany(mappedBy = "event")
+    private List<AttendanceList> attendanceLists;
+
+
 
     public Event() { }
 
@@ -78,6 +80,17 @@ public class Event {
 
     public Set<User> getUsers() {
         return users;
+    }
+    public void setUsers(Set<User> users) {
+        this.users = users;
+    }
+
+    public List<AttendanceList> getAttendanceLists() {
+        return attendanceLists;
+    }
+
+    public void setAttendanceLists(List<AttendanceList> attendanceLists) {
+        this.attendanceLists = attendanceLists;
     }
 
 }
