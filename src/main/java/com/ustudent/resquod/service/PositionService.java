@@ -1,13 +1,8 @@
 package com.ustudent.resquod.service;
 
 import com.ustudent.resquod.exception.*;
-import com.ustudent.resquod.model.Corporation;
-import com.ustudent.resquod.model.Position;
-import com.ustudent.resquod.model.Room;
-import com.ustudent.resquod.model.User;
-import com.ustudent.resquod.model.dao.NewPositionData;
-import com.ustudent.resquod.model.dao.PositionData;
-import com.ustudent.resquod.model.dao.UserData;
+import com.ustudent.resquod.model.*;
+import com.ustudent.resquod.model.dao.*;
 import com.ustudent.resquod.repository.PositionRepository;
 import com.ustudent.resquod.repository.RoomRepository;
 import com.ustudent.resquod.repository.UserRepository;
@@ -81,10 +76,19 @@ public class PositionService {
         positionRepository.save(position);
     }
 
-    public void getPresenceAtPosition(String tagId) {
+    public EventAndAttendanceListData getPresenceAtPosition(String tagId) {
         if (tagId == null || tagId.isEmpty()) throw new InvalidInputException();
         LocalDateTime date = LocalDateTime.now();
         User user = userService.getLoggedUser();
-        presenceService.getPresence(tagId, date, user.getId());
+        Presence presence=presenceService.getPresence(tagId, date, user.getId());
+        EventAndAttendanceListData eventAndAttendanceListData=new EventAndAttendanceListData();
+        eventAndAttendanceListData.setPresenceAt(presence.getDate());
+        eventAndAttendanceListData.setAttendanceListId(presence.getAttendanceList().getId());
+        eventAndAttendanceListData.setAttendanceListName(presence.getAttendanceList().getName());
+        eventAndAttendanceListData.setStartTime(presence.getAttendanceList().getStartTime());
+        eventAndAttendanceListData.setEndTime(presence.getAttendanceList().getEndTime());
+        eventAndAttendanceListData.setEventId(presence.getAttendanceList().getEvent().getId());
+        eventAndAttendanceListData.setEventName(presence.getAttendanceList().getEvent().getName());
+        return eventAndAttendanceListData;
     }
 }
