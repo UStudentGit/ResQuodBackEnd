@@ -16,6 +16,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
 @Service
 public class PositionService {
 
@@ -25,30 +27,33 @@ public class PositionService {
     private final RoomService roomService;
     private final UserService userService;
     private final UserRepository userRepository;
+    private final PresenceService presenceService;
 
     @Autowired
-    PositionService(PositionRepository positionRepository,PositionValidator positionValidator,
-                    RoomRepository roomRepository, UserRepository userRepository,RoomService roomService,
-                    UserService userService) {
-        this.positionRepository=positionRepository;
-        this.roomRepository=roomRepository;
-        this.positionValidator=positionValidator;
+    PositionService(PositionRepository positionRepository, PositionValidator positionValidator,
+                    RoomRepository roomRepository, UserRepository userRepository, RoomService roomService,
+                    UserService userService, PresenceService presenceService) {
+        this.positionRepository = positionRepository;
+        this.roomRepository = roomRepository;
+        this.positionValidator = positionValidator;
         this.userRepository = userRepository;
-        this.roomService=roomService;
-        this.userService=userService;
+        this.roomService = roomService;
+        this.userService = userService;
+        this.presenceService = presenceService;
     }
 
     public void addNewPosition(NewPositionData newPosition) throws PositionAlreadyExistsException, PermissionDeniedException {
 
-        User admin = userService.getLoggedUser();
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User admin = userService.getUserByEmail(email);
         Corporation corporation = roomService.getRoomById(newPosition.getRoomId()).getCorporation();
 
         if (!(admin.getRole().equals("ROLE_ADMIN") ||
                 (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
             throw new PermissionDeniedException();
 
-        if(!checkIfPositionExists(newPosition)) {
-            if(positionValidator.validatePosition(newPosition)) {
+        if (!checkIfPositionExists(newPosition)) {
+            if (positionValidator.validatePosition(newPosition)) {
                 Room room = roomService.getRoomById(newPosition.getRoomId());
                 Position position = new Position();
                 position.setNumberOfPosition(newPosition.getNumberOfPosition());
@@ -60,19 +65,26 @@ public class PositionService {
     }
 
     private boolean checkIfPositionExists(NewPositionData positionToValidate) {
-        return positionRepository.findByNumberOfPosition(positionToValidate.getNumberOfPosition(),positionToValidate.getRoomId()).isPresent();
+        return positionRepository.findByNumberOfPosition(positionToValidate.getNumberOfPosition(), positionToValidate.getRoomId()).isPresent();
     }
 
     public void updatePosition(PositionData positionInput) throws EmailExistException, PositionNotFoundException, RoomNotFoundException, InvalidInputException {
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         UserData userData = userRepository.findUserData(email).orElseThrow(EmailExistException::new);
         Position position = positionRepository.findByIdAndEmail(positionInput.getId(), userData.getEmail()).orElseThrow(PositionNotFoundException::new);
-        if(positionInput.getTagId() == null || positionInput.getTagId().length() < 1 || positionInput.getNumberOfPosition() == null)
+        if (positionInput.getTagId() == null || positionInput.getTagId().length() < 1 || positionInput.getNumberOfPosition() == null)
             throw new InvalidInputException();
         position.setTagId(positionInput.getTagId());
         position.setNumberOfPosition(positionInput.getNumberOfPosition());
         Room room = roomRepository.findByRoomIdAndOwnerEmail(positionInput.getRoomId(), email).orElseThrow(RoomNotFoundException::new);
         position.setRoom(room);
         positionRepository.save(position);
+    }
+
+    public void getPresenceAtPosition(String tagId) {
+        if (tagId == null || tagId.isEmpty()) throw new InvalidInputException();
+        LocalDateTime date = LocalDateTime.now();
+        User user = userService.getLoggedUser();
+        presenceService.getPresence(tagId, date, user.getId());
     }
 }

@@ -1,7 +1,7 @@
 package com.ustudent.resquod.controller;
 
 import com.ustudent.resquod.exception.*;
-import com.ustudent.resquod.model.Position;
+import com.ustudent.resquod.model.Presence;
 import com.ustudent.resquod.model.dao.NewPositionData;
 import com.ustudent.resquod.model.dao.PositionData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
@@ -13,8 +13,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 @RestController
-@Api(value="Position Management")
+@Api(value = "Position Management")
 public class PositionController {
 
     private final PositionService positionService;
@@ -25,12 +27,13 @@ public class PositionController {
     }
 
     @ApiOperation(value = "Add New Position", authorizations = {@Authorization(value = "authkey")})
-    @ApiResponses(value = { @ApiResponse(code = 200, message = "Position Added Succesfully"),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Position Added Succesfully"),
             @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Possition Already Exists\" or \"Id Tag Already Exists\" or \"Permission Denied\""),
-            @ApiResponse( code = 404, message = "Room Does Not Exist")})
+            @ApiResponse(code = 404, message = "Room Does Not Exist")})
     @PostMapping("/position")
-    public ResponseTransfer addNewPosition(@ApiParam(value = "Required number of position, room id", required = true)
-                                               @RequestBody NewPositionData newPosition) {
+    public ResponseTransfer addNewPosition(@ApiParam(value = "Required number of position, room id", required = true,
+            examples = @Example(value = {@ExampleProperty(value = "{'numberOfPosition': Integer, 'room': {'id': Long}}", mediaType = "application/json")}))
+                                           @RequestBody NewPositionData newPosition) {
         try {
             positionService.addNewPosition(newPosition);
         } catch (PositionAlreadyExistsException exception) {
@@ -67,5 +70,23 @@ public class PositionController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
         }
         return new ResponseTransfer("Successfully updated!");
+    }
+
+    @ApiOperation(value = "Read NFC tag and get presence!", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully updated!"),
+            @ApiResponse(code = 400, message = "Invalid input! or There is no event to get Presence!"),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @PostMapping("/presenceAtPosition")
+    public ResponseTransfer getPresenceAtPosition(
+            @ApiParam(value = "Required tagId", required = true)
+            @RequestParam String tagId) {
+        try {
+            positionService.getPresenceAtPosition(tagId);
+            return new ResponseTransfer("Successfully updated!");
+        } catch (InvalidInputException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid input!");
+        } catch (ObjectNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "There is no event to get Presence! or Bad TagId");
+        }
     }
 }

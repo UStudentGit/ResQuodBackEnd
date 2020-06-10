@@ -1,15 +1,16 @@
 package com.ustudent.resquod.model.dao;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 public class PresenceData {
     private Long id;
     private Boolean presence;
-    private Date date;
+    private LocalDateTime date;
     private Long user_id;
     private Long attendance_list_id;
 
-    public PresenceData(Long id, Boolean presence, Date date, Long user_id, Long attendance_list_id){
+    public PresenceData(Long id, Boolean presence, LocalDateTime date, Long user_id, Long attendance_list_id){
         this.id = id;
         this.presence = presence;
         this.date = date;
@@ -31,11 +32,11 @@ public class PresenceData {
         this.presence = presence;
     }
 
-    public Date getDate() {
+    public LocalDateTime getDate() {
         return date;
     }
 
-    public void setDate(Date date) {
+    public void setDate(LocalDateTime date) {
         this.date = date;
     }
 

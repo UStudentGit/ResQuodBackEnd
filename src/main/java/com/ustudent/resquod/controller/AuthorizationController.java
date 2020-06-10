@@ -4,7 +4,6 @@ import com.ustudent.resquod.exception.EmailExistException;
 import com.ustudent.resquod.exception.InvalidInputException;
 import com.ustudent.resquod.exception.InvalidPasswordException;
 import com.ustudent.resquod.exception.PasswordMatchedException;
-import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.*;
 
 import com.ustudent.resquod.service.JwtService;
@@ -62,11 +61,8 @@ public class AuthorizationController {
     public TokenTransfer login(
             @ApiParam(value = "Required email, password", required = true)
             @RequestBody LoginUserData userInput) {
-        LoginUserData userData;
         try {
-            userService.validateLoginData(userInput);
-            userData = userService.getUserDataIfExist(userInput.getEmail());
-            userService.verifyPassword(userInput.getPassword(), userData.getPassword());
+            return userService.login(userInput);
         } catch (InvalidInputException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid input!");
         } catch (EmailExistException ex) {
@@ -74,8 +70,7 @@ public class AuthorizationController {
         } catch (InvalidPasswordException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid password!");
         }
-        String token = jwtService.sign(userData.getEmail(), userData.getRole());
-        return new TokenTransfer(token);
+
     }
 
     @ApiOperation(value = "Get current user", authorizations = {@Authorization(value = "authkey")})
