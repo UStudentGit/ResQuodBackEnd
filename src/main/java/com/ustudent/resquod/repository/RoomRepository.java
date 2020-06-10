@@ -25,4 +25,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             "FROM  Room r JOIN Corporation c ON r.corporation.id=c.id  " +
             "WHERE c.id = ?1")
     Set<RoomDTO> findByCorporationId(Long id);
+
+    @Query(value = "DELETE FROM Room r WHERE r.id=?1")
+    void removeRoomById(Long Id);
 }

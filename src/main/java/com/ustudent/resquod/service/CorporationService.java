@@ -3,6 +3,7 @@ package com.ustudent.resquod.service;
 import com.ustudent.resquod.exception.CorporationNotFoundException;
 import com.ustudent.resquod.exception.InvalidInputException;
 import com.ustudent.resquod.model.Corporation;
+import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.CorpoData;
 import com.ustudent.resquod.repository.CorporationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class CorporationService {

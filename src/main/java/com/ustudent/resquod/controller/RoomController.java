@@ -81,6 +81,20 @@ public class RoomController {
         return new ResponseTransfer("Successfully updated!");
     }
 
-
+    @ApiOperation(value = "Remove Room", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Room Removed Succesfully"),
+            @ApiResponse(code = 400, message = "Permission Denied"),
+            @ApiResponse( code = 404, message = "Room Does Not Exist")})
+    @PostMapping("/roomRemoval")
+    public ResponseTransfer deleteRoom(@ApiParam(value = "Required room id", required = true)
+                                       @RequestBody NewRoomData newRoom) {
+        try {
+            roomService.removeRoom(newRoom);
+        } catch (PermissionDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
+        } catch (RoomNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room Does Not Exist");
+        }
+        return new ResponseTransfer("Room Removed Successfully");
+    }
 }
-
