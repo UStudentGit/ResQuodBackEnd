@@ -24,10 +24,13 @@ public class PresenceService {
         return presenceRepository.findPresencesByUserEmail(email);
     }
 
-    public void getPresence(String tagId, LocalDateTime date, Long id) {
+    public Presence getPresence(String tagId, LocalDateTime date, Long id) {
         Presence presence = presenceRepository.findByDateAfter(id, tagId, date).orElseThrow(ObjectNotFoundException::new).get(0);
-        presence.setDate(date);
-        presence.setPresence(true);
-        presenceRepository.save(presence);
+        if (presence.getDate()==null){
+            presence.setDate(date);
+            presence.setPresence(true);
+            presenceRepository.save(presence);
+        }
+        return presence;
     }
 }

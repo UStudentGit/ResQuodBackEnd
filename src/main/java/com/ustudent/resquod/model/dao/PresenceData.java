@@ -1,7 +1,6 @@
 package com.ustudent.resquod.model.dao;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public class PresenceData {
     private Long id;
