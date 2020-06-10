@@ -7,10 +7,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 @Repository
 public interface PresenceRepository extends JpaRepository<Presence, Integer> {
@@ -27,6 +25,6 @@ public interface PresenceRepository extends JpaRepository<Presence, Integer> {
             "JOIN Event e ON e.id=a.event.id " +
             "JOIN Room r ON r.id=e.room.id " +
             "JOIN Position p2 ON p2.room.id=r.id " +
-            "WHERE u.id=?1 AND p2.tagId= ?2 AND a.startTime <= ?3 order by a.startTime desc")
+            "WHERE u.id=?1 AND p2.tagId= ?2 AND a.startTime <= ?3 AND a.endTime >= ?3 order by a.startTime desc")
     Optional<List<Presence>> findByDateAfter(Long userId, String nfcTag, LocalDateTime date);
 }
