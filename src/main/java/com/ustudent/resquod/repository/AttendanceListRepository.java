@@ -19,6 +19,7 @@ public interface AttendanceListRepository extends JpaRepository<AttendanceList,I
     List<AttendanceListData> findListsByUserEmail(String email);
 
 
+    AttendanceList findById(Long Id);
 
     List<AttendanceList> findByEventId(Long eventId);
 
