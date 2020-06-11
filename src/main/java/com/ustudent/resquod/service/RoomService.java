@@ -68,6 +68,9 @@ public class RoomService {
 
     public void removeRoom(NewRoomData roomToRemove) {
 
+        if(roomToRemove.getId() == null)
+            throw new InvalidInputException();
+
         User admin = userService.getLoggedUser();
         Room room = roomRepository.findById(roomToRemove.getId()).orElseThrow(RoomNotFoundException::new);
         Corporation corporation = corporationService.getCorpoById(room.getCorporation().getId());
@@ -76,7 +79,8 @@ public class RoomService {
                 (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
             throw new PermissionDeniedException();
 
-        roomRepository.removeRoomById(roomToRemove.getId());
+        roomRepository.delete(room);
+        //roomRepository.removeRoomById(room.getId());
     }
 
     public Room findById(Long id) throws ObjectNotFoundException {

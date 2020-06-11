@@ -1,9 +1,7 @@
 package com.ustudent.resquod.controller;
 
-
 import com.ustudent.resquod.model.dao.NewRoomData;
 import com.ustudent.resquod.exception.*;
-import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.model.dao.RoomDTO;
 import com.ustudent.resquod.service.RoomService;
@@ -37,8 +35,6 @@ public class RoomController {
             roomService.addNewRoom(newRoom);
         } catch (RoomAlreadyExistsException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Room Already Exists");
-        } catch (InvalidInputException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Input");
         } catch (CorporationNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Corporation Does Not Exist");
         } catch (PermissionDeniedException e) {
@@ -83,7 +79,7 @@ public class RoomController {
 
     @ApiOperation(value = "Remove Room", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Room Removed Succesfully"),
-            @ApiResponse(code = 400, message = "Permission Denied"),
+            @ApiResponse(code = 400, message = "\"Permission Denied\" or \"Invalid Input\""),
             @ApiResponse( code = 404, message = "Room Does Not Exist")})
     @PostMapping("/roomRemoval")
     public ResponseTransfer deleteRoom(@ApiParam(value = "Required room id", required = true)
@@ -94,6 +90,8 @@ public class RoomController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
         } catch (RoomNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Room Does Not Exist");
+        } catch (InvalidInputException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Input");
         }
         return new ResponseTransfer("Room Removed Successfully");
     }

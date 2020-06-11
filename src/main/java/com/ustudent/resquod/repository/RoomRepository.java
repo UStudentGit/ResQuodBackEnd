@@ -28,4 +28,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
 
     @Query(value = "DELETE FROM Room r WHERE r.id=?1")
     void removeRoomById(Long Id);
+
+    @Override
+    void delete(Room room);
 }
