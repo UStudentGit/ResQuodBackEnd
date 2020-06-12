@@ -80,7 +80,6 @@ public class RoomService {
             throw new PermissionDeniedException();
 
         roomRepository.delete(room);
-        //roomRepository.removeRoomById(room.getId());
     }
 
     public Room findById(Long id) throws ObjectNotFoundException {

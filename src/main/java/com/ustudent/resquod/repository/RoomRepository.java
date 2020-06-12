@@ -13,7 +13,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
 
     Optional<Room> findByName(String name);
 
-    Optional<Room> findById(Long Id);
+    Optional<Room> findById(Long id);
 
     @Query(value = "SELECT r FROM Room r " +
             "INNER JOIN Corporation c ON c.id = r.corporation.id " +
@@ -27,7 +27,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
     Set<RoomDTO> findByCorporationId(Long id);
 
     @Query(value = "DELETE FROM Room r WHERE r.id=?1")
-    void removeRoomById(Long Id);
+    void removeRoomById(Long id);
 
     @Override
     void delete(Room room);

@@ -2,24 +2,24 @@ package com.ustudent.resquod.model.dao;
 
 public class PositionData {
 
-    private Long Id;
+    private Long id;
     private Integer numberOfPosition;
     private String tagId;
     private Long room_id;
 
-    public PositionData(Long Id, Integer numberOfPosition, String tagId, Long room_id){
-        this.Id = Id;
+    public PositionData(Long id, Integer numberOfPosition, String tagId, Long room_id){
+        this.id = id;
         this.numberOfPosition = numberOfPosition;
         this.tagId = tagId;
         this.room_id = room_id;
     }
 
     public Long getId() {
-        return Id;
+        return id;
     }
 
     public void setId(Long id) {
-        Id = id;
+        id = id;
     }
 
     public Integer getNumberOfPosition() {

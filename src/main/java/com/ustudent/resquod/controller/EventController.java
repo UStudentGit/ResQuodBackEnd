@@ -81,8 +81,9 @@ public class EventController {
 
     @ApiOperation(value = "Add New Event", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Event Added Succesfully"),
-            @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Event Already Exists\" or \"Permission Denied\""),
-            @ApiResponse( code = 404, message = "Room Does Not Exist")})
+            @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Event Already Exists\""),
+            @ApiResponse( code = 404, message = "Room Does Not Exist"),
+            @ApiResponse(code = 401, message = "Permission Denied")})
     @PostMapping("/event")
     public ResponseTransfer addNewEvent(@ApiParam(value = "Required name, password, room id", required = true)
                                             @RequestBody NewEventData newEvent) {
@@ -95,7 +96,7 @@ public class EventController {
         } catch (InvalidInputException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Input");
         } catch (PermissionDeniedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permission Denied");
         }
         return new ResponseTransfer("Event Added Successfully");
     }
@@ -115,14 +116,14 @@ public class EventController {
 
     @ApiOperation(value = "Returns Corporation's Events", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = { @ApiResponse(code = 200, message = "Corporation events:"),
-            @ApiResponse(code = 400, message = "Permission Denied")})
+            @ApiResponse(code = 401, message = "Permission Denied")})
     @PostMapping(value = "/corpotationsEvents")
     public List<EventData> getCorpoEvents(@ApiParam(value = "Required corporation id", required = true)
                                           @RequestBody CorpoData corpoId) {
         try {
             return eventService.findByCorpoId(corpoId.getId());
         } catch (PermissionDeniedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permission Denied");
         }
     }
 }

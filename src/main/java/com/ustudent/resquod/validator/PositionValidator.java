@@ -13,4 +13,10 @@ public class PositionValidator {
             throw new InvalidInputException();
         return true;
     }
+
+    public boolean validateTagId(String idTag) {
+        if(idTag == null || idTag.isEmpty())
+            return false;
+        return true;
+    }
 }

@@ -4,6 +4,7 @@ import com.ustudent.resquod.model.Position;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface PositionRepository extends JpaRepository<Position,Long> {
@@ -21,4 +22,12 @@ public interface PositionRepository extends JpaRepository<Position,Long> {
     Optional<Position> findByIdAndEmail(Long id, String email);
 
     Optional<Position> findByTagId(String TagId);
+
+    @Query(value = "SELECT p FROM Position p " +
+            "WHERE p.tagId is null")
+    List<Position> findNullTags();
+
+    @Query(value = "SELECT p FROM Position p " +
+            "WHERE p.tagId is null AND p.room.corporation.id = ?1")
+    List<Position> findCorpoNullTags(Long corpoId);
 }
