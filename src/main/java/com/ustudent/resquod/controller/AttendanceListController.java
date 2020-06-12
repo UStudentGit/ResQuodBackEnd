@@ -6,14 +6,12 @@ import com.ustudent.resquod.model.dao.AttendanceListData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.service.AttendanceListService;
-import com.ustudent.resquod.service.UserService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -24,12 +22,10 @@ import java.util.List;
 public class AttendanceListController {
 
     private final AttendanceListService attendanceListService;
-    private final UserService userService;
 
     @Autowired
-    public AttendanceListController(AttendanceListService attendanceListService, UserService userService) {
+    public AttendanceListController(AttendanceListService attendanceListService) {
         this.attendanceListService = attendanceListService;
-        this.userService = userService;
     }
 
     @ApiOperation(value = "Creates attendance list for specified event", authorizations = {@Authorization(value = "authkey")})
@@ -53,6 +49,9 @@ public class AttendanceListController {
         catch(EventNotFoundException ex){
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while creating list. Event not found.");
         }
+        catch(UserNotFoundException ex){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Error while creating list. User not found.");
+        }
     }
 
     @ApiOperation(value = "Returns attendance list for specified event", authorizations = {@Authorization(value = "authkey")})
@@ -67,7 +66,6 @@ public class AttendanceListController {
         } catch (EventNotFoundException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event not found! Bad request");
         }
-
     }
 
     @ApiOperation(value = "Returns present users data from specified Attendance List", authorizations = {@Authorization(value = "authkey")})
@@ -102,9 +100,7 @@ public class AttendanceListController {
     @GetMapping(value = "/userAttendanceLists")
     public List<AttendanceListData> getUserAttendanceLists() {
         try {
-            String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-            UserData userData = userService.getUser(email);
-            return attendanceListService.findUserAttendanceLists(userData.getEmail());
+            return attendanceListService.findUserAttendanceLists();
         } catch (EmailExistException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bad request");
         }

@@ -2,6 +2,7 @@ package com.ustudent.resquod.controller;
 
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.dao.CorpoData;
+import com.ustudent.resquod.model.dao.EventAndAttendanceListData;
 import com.ustudent.resquod.model.dao.NewPositionData;
 import com.ustudent.resquod.model.dao.PositionData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
@@ -12,8 +13,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-
-import java.util.List;
 
 @RestController
 @Api(value = "Position Management")
@@ -104,16 +103,14 @@ public class PositionController {
     }
 
     @ApiOperation(value = "Read NFC tag and get presence!", authorizations = {@Authorization(value = "authkey")})
-    @ApiResponses(value = {@ApiResponse(code = 200, message = "Successfully updated!"),
-            @ApiResponse(code = 400, message = "Invalid input! or There is no event to get Presence!"),
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Invalid input! or There is no event to get Presence!"),
             @ApiResponse(code = 500, message = "Server Error!")})
     @PostMapping("/presenceAtPosition")
-    public ResponseTransfer getPresenceAtPosition(
+    public EventAndAttendanceListData getPresenceAtPosition(
             @ApiParam(value = "Required tagId", required = true)
             @RequestParam String tagId) {
         try {
-            positionService.getPresenceAtPosition(tagId);
-            return new ResponseTransfer("Successfully updated!");
+            return positionService.getPresenceAtPosition(tagId);
         } catch (InvalidInputException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid input!");
         } catch (ObjectNotFoundException e) {
