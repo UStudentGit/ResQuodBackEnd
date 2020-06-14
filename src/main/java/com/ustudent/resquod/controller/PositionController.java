@@ -1,6 +1,7 @@
 package com.ustudent.resquod.controller;
 
 import com.ustudent.resquod.exception.*;
+import com.ustudent.resquod.model.dao.CorpoData;
 import com.ustudent.resquod.model.dao.EventAndAttendanceListData;
 import com.ustudent.resquod.model.dao.NewPositionData;
 import com.ustudent.resquod.model.dao.PositionData;
@@ -24,14 +25,45 @@ public class PositionController {
         this.positionService = positionService;
     }
 
+    @ApiOperation(value = "Returns positions with null tag id", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "OK"),
+            @ApiResponse(code = 401, message = "Permission Denied")})
+    @GetMapping("/nullTagsGetter")
+    public List<PositionData> getNullTags(@ApiParam(value = "Required corporation id", required = true)
+                                          @RequestBody CorpoData corpoData) {
+        return positionService.getNullTags(corpoData);
+    }
+
+    @ApiOperation(value = "Setting tag id for possition", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Id Tag updated Succesfully"),
+            @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Tag Id Already Exists\""),
+            @ApiResponse(code = 404, message = "Position Does Not Exist"),
+            @ApiResponse(code = 401, message = "Permission Denied")})
+    @PatchMapping("/TagIdSetter")
+    public ResponseTransfer setTagId(@ApiParam(value = "Required position id, tag id", required = true)
+                                         @RequestBody PositionData positionData) {
+        try {
+            positionService.setTagId(positionData);
+        } catch (PermissionDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permission Denied");
+        } catch (PositionNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Position Does Not Exist");
+        } catch (DataIntegrityViolationException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tag Id Already Exists");
+        } catch (InvalidInputException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid Input");
+        }
+        return new ResponseTransfer("Id Tag Updated Successfully");
+    }
+
     @ApiOperation(value = "Add New Position", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = {@ApiResponse(code = 200, message = "Position Added Succesfully"),
-            @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Possition Already Exists\" or \"Id Tag Already Exists\" or \"Permission Denied\""),
-            @ApiResponse(code = 404, message = "Room Does Not Exist")})
+            @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Possition Already Exists\" or \"Id Tag Already Exists\""),
+            @ApiResponse(code = 404, message = "Room Does Not Exist"),
+            @ApiResponse(code = 401, message = "Permission Denied")})
     @PostMapping("/position")
-    public ResponseTransfer addNewPosition(@ApiParam(value = "Required number of position, room id", required = true,
-            examples = @Example(value = {@ExampleProperty(value = "{'numberOfPosition': Integer, 'room': {'id': Long}}", mediaType = "application/json")}))
-                                           @RequestBody NewPositionData newPosition) {
+    public ResponseTransfer addNewPosition(@ApiParam(value = "Required number of position, room id", required = true)
+            @RequestBody NewPositionData newPosition) {
         try {
             positionService.addNewPosition(newPosition);
         } catch (PositionAlreadyExistsException exception) {
@@ -43,7 +75,7 @@ public class PositionController {
         } catch (DataIntegrityViolationException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Id Tag Already Exists");
         } catch (PermissionDeniedException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Permission Denied");
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permission Denied");
         }
         return new ResponseTransfer("Position Added Successfully");
     }

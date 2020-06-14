@@ -1,6 +1,8 @@
 package com.ustudent.resquod.model;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "rooms")
@@ -11,6 +13,11 @@ public class Room {
     private String name;
     @ManyToOne(fetch = FetchType.LAZY)
     private Corporation corporation;
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "room")
+    private final Set<Position> positions = new HashSet<>();
+    @OneToMany(cascade = CascadeType.REMOVE, mappedBy = "room")
+    private final Set<Event> event = new HashSet<>();
+    public Set<Position> getPositions() { return positions; }
 
     public Long getId() {
         return id;
@@ -33,4 +40,5 @@ public class Room {
     public void setCorporation(Corporation corporation) {
         this.corporation = corporation;
     }
+
 }

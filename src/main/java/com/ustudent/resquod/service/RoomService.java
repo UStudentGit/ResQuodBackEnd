@@ -5,6 +5,7 @@ import com.ustudent.resquod.exception.RoomAlreadyExistsException;
 import com.ustudent.resquod.exception.RoomNotFoundException;
 import com.ustudent.resquod.exception.ObjectNotFoundException;
 import com.ustudent.resquod.model.Corporation;
+import com.ustudent.resquod.model.Position;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.User;
 import com.ustudent.resquod.model.dao.NewRoomData;
@@ -23,7 +24,6 @@ import java.util.Set;
 public class RoomService {
 
     private final RoomRepository roomRepository;
-
     private final CorporationService corporationService;
     private final UserService userService;
     private final RoomValidator roomValidator;
@@ -37,7 +37,6 @@ public class RoomService {
         this.roomValidator = roomValidator;
         this.corporationService = corporationService;
         this.userService = userService;
-
     }
 
     public void addNewRoom(NewRoomData newRoom) throws RoomAlreadyExistsException, PermissionDeniedException {
@@ -67,6 +66,21 @@ public class RoomService {
         return roomRepository.findById(roomId).orElseThrow(RoomNotFoundException::new);
     }
 
+    public void removeRoom(NewRoomData roomToRemove) {
+
+        if(roomToRemove.getId() == null)
+            throw new InvalidInputException();
+
+        User admin = userService.getLoggedUser();
+        Room room = roomRepository.findById(roomToRemove.getId()).orElseThrow(RoomNotFoundException::new);
+        Corporation corporation = corporationService.getCorpoById(room.getCorporation().getId());
+
+        if (!(admin.getRole().equals("ROLE_ADMIN") ||
+                (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation))))
+            throw new PermissionDeniedException();
+
+        roomRepository.delete(room);
+    }
 
     public Room findById(Long id) throws ObjectNotFoundException {
         return roomRepository.findById(id).orElseThrow(ObjectNotFoundException::new);

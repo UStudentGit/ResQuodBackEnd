@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.LinkedList;
+import java.util.List;
 
 @Service
 public class PositionService {
@@ -23,11 +25,12 @@ public class PositionService {
     private final UserService userService;
     private final UserRepository userRepository;
     private final PresenceService presenceService;
+    private final CorporationService corporationService;
 
     @Autowired
     PositionService(PositionRepository positionRepository, PositionValidator positionValidator,
                     RoomRepository roomRepository, UserRepository userRepository, RoomService roomService,
-                    UserService userService, PresenceService presenceService) {
+                    UserService userService, PresenceService presenceService, CorporationService corporationService) {
         this.positionRepository = positionRepository;
         this.roomRepository = roomRepository;
         this.positionValidator = positionValidator;
@@ -35,6 +38,7 @@ public class PositionService {
         this.roomService = roomService;
         this.userService = userService;
         this.presenceService = presenceService;
+        this.corporationService = corporationService;
     }
 
     public void addNewPosition(NewPositionData newPosition) throws PositionAlreadyExistsException, PermissionDeniedException {
@@ -90,5 +94,60 @@ public class PositionService {
         eventAndAttendanceListData.setEventId(presence.getAttendanceList().getEvent().getId());
         eventAndAttendanceListData.setEventName(presence.getAttendanceList().getEvent().getName());
         return eventAndAttendanceListData;
+    }
+
+    public void setTagId(PositionData positionData) {
+
+        Position position = positionRepository.findById(positionData.getId()).orElseThrow(PositionNotFoundException::new);
+        Room room = roomService.getRoomById(position.getRoom().getId());
+        User admin = userService.getLoggedUser();
+
+        if (!(admin.getRole().equals("ROLE_ADMIN") ||
+                (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(room.getCorporation()))))
+            throw new PermissionDeniedException();
+
+        if(!positionValidator.validateTagId(positionData.getTagId()))
+            throw new InvalidInputException();
+
+        position.setTagId(positionData.getTagId());
+        positionRepository.save(position);
+    }
+
+    public List<PositionData> getNullTags(CorpoData corpoData) {
+
+        User admin = userService.getLoggedUser();
+
+        if(admin.getRole().equals("ROLE_USER"))
+            throw new PermissionDeniedException();
+
+        List<Position> positionsWithNulls;
+        List<PositionData> positionDataList = new LinkedList<>();
+
+        if((admin.getRole().equals("ROLE_ADMIN"))) {
+            positionsWithNulls = positionRepository.findNullTags();
+            for (Position position : positionsWithNulls) {
+                PositionData positionData = new PositionData(position.getId(),
+                        position.getNumberOfPosition(),
+                        position.getTagId(),
+                        position.getRoom().getId());
+                positionDataList.add(positionData);
+            }
+        }
+
+        Long corpoId = corpoData.getId();
+        Corporation corporation = corporationService.getCorpoById(corpoId);
+
+        if(!(admin.getRole().equals("ROLE_OWNER") || admin.getCorporations().contains(corporation)))
+            throw new PermissionDeniedException();
+
+        positionsWithNulls = positionRepository.findCorpoNullTags(corpoId);
+        for (Position position : positionsWithNulls) {
+            PositionData positionData = new PositionData(position.getId(),
+                    position.getNumberOfPosition(),
+                    position.getTagId(),
+                    position.getRoom().getId());
+            positionDataList.add(positionData);
+        }
+        return positionDataList;
     }
 }
