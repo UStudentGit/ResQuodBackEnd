@@ -6,12 +6,14 @@ public class PositionData {
     private Integer numberOfPosition;
     private String tagId;
     private Long room_id;
+    private String roomName;
 
-    public PositionData(Long id, Integer numberOfPosition, String tagId, Long room_id){
+    public PositionData(Long id, Integer numberOfPosition, String tagId, Long room_id, String roomName){
         this.id = id;
         this.numberOfPosition = numberOfPosition;
         this.tagId = tagId;
         this.room_id = room_id;
+        this.roomName= roomName;
     }
 
     public Long getId() {
@@ -46,4 +48,19 @@ public class PositionData {
         this.tagId = tagId;
     }
 
+    public Long getRoom_id() {
+        return room_id;
+    }
+
+    public void setRoom_id(Long room_id) {
+        this.room_id = room_id;
+    }
+
+    public String getRoomName() {
+        return roomName;
+    }
+
+    public void setRoomName(String roomName) {
+        this.roomName = roomName;
+    }
 }

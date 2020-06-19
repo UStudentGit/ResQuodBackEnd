@@ -32,8 +32,8 @@ public class PositionController {
             @ApiResponse(code = 401, message = "Permission Denied")})
     @GetMapping("/nullTagsGetter")
     public List<PositionData> getNullTags(@ApiParam(value = "Required corporation id", required = true)
-                                          @RequestBody CorpoData corpoData) {
-        return positionService.getNullTags(corpoData);
+                                          @RequestParam Long id) {
+        return positionService.getNullTags(id);
     }
 
     @ApiOperation(value = "Setting tag id for possition", authorizations = {@Authorization(value = "authkey")})
