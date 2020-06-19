@@ -24,10 +24,6 @@ public interface PositionRepository extends JpaRepository<Position,Long> {
     Optional<Position> findByTagId(String TagId);
 
     @Query(value = "SELECT p FROM Position p " +
-            "WHERE p.tagId is null")
-    List<Position> findNullTags();
-
-    @Query(value = "SELECT p FROM Position p " +
             "WHERE p.tagId is null AND p.room.corporation.id = ?1")
     List<Position> findCorpoNullTags(Long corpoId);
 }

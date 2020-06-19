@@ -2,7 +2,10 @@ package com.ustudent.resquod.service;
 
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.*;
-import com.ustudent.resquod.model.dao.*;
+import com.ustudent.resquod.model.dao.EventAndAttendanceListData;
+import com.ustudent.resquod.model.dao.NewPositionData;
+import com.ustudent.resquod.model.dao.PositionData;
+import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.repository.PositionRepository;
 import com.ustudent.resquod.repository.RoomRepository;
 import com.ustudent.resquod.repository.UserRepository;
@@ -84,8 +87,8 @@ public class PositionService {
         if (tagId == null || tagId.isEmpty()) throw new InvalidInputException();
         LocalDateTime date = LocalDateTime.now();
         User user = userService.getLoggedUser();
-        Presence presence=presenceService.getPresence(tagId, date, user.getId());
-        EventAndAttendanceListData eventAndAttendanceListData=new EventAndAttendanceListData();
+        Presence presence = presenceService.getPresence(tagId, date, user.getId());
+        EventAndAttendanceListData eventAndAttendanceListData = new EventAndAttendanceListData();
         eventAndAttendanceListData.setPresenceAt(presence.getDate());
         eventAndAttendanceListData.setAttendanceListId(presence.getAttendanceList().getId());
         eventAndAttendanceListData.setAttendanceListName(presence.getAttendanceList().getName());
@@ -106,47 +109,49 @@ public class PositionService {
                 (admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(room.getCorporation()))))
             throw new PermissionDeniedException();
 
-        if(!positionValidator.validateTagId(positionData.getTagId()))
+        if (!positionValidator.validateTagId(positionData.getTagId()))
             throw new InvalidInputException();
 
         position.setTagId(positionData.getTagId());
         positionRepository.save(position);
     }
 
-    public List<PositionData> getNullTags(CorpoData corpoData) {
+    public List<PositionData> getNullTags(Long CorporationId) {
 
         User admin = userService.getLoggedUser();
 
-        if(admin.getRole().equals("ROLE_USER"))
+        if (admin.getRole().equals("ROLE_USER"))
             throw new PermissionDeniedException();
+        if(CorporationId==null)
+            throw new ObjectNotFoundException();
 
         List<Position> positionsWithNulls;
         List<PositionData> positionDataList = new LinkedList<>();
 
-        if((admin.getRole().equals("ROLE_ADMIN"))) {
-            positionsWithNulls = positionRepository.findNullTags();
+        if ((admin.getRole().equals("ROLE_ADMIN"))) {
+            positionsWithNulls = positionRepository.findCorpoNullTags(CorporationId);
             for (Position position : positionsWithNulls) {
                 PositionData positionData = new PositionData(position.getId(),
                         position.getNumberOfPosition(),
                         position.getTagId(),
-                        position.getRoom().getId());
+                        position.getRoom().getId(),
+                        position.getRoom().getName());
                 positionDataList.add(positionData);
             }
-        }
+        } else {
+            Corporation corporation = corporationService.getCorpoById(CorporationId);
+            if (!(admin.getRole().equals("ROLE_OWNER") || admin.getCorporations().contains(corporation)))
+                throw new PermissionDeniedException();
 
-        Long corpoId = corpoData.getId();
-        Corporation corporation = corporationService.getCorpoById(corpoId);
-
-        if(!(admin.getRole().equals("ROLE_OWNER") || admin.getCorporations().contains(corporation)))
-            throw new PermissionDeniedException();
-
-        positionsWithNulls = positionRepository.findCorpoNullTags(corpoId);
-        for (Position position : positionsWithNulls) {
-            PositionData positionData = new PositionData(position.getId(),
-                    position.getNumberOfPosition(),
-                    position.getTagId(),
-                    position.getRoom().getId());
-            positionDataList.add(positionData);
+            positionsWithNulls = positionRepository.findCorpoNullTags(CorporationId);
+            for (Position position : positionsWithNulls) {
+                PositionData positionData = new PositionData(position.getId(),
+                        position.getNumberOfPosition(),
+                        position.getTagId(),
+                        position.getRoom().getId(),
+                        position.getRoom().getName());
+                positionDataList.add(positionData);
+            }
         }
         return positionDataList;
     }
