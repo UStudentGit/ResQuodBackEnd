@@ -1,10 +1,8 @@
 package com.ustudent.resquod.controller;
 
 
-import com.ustudent.resquod.model.dao.*;
-import com.ustudent.resquod.model.Event;
 import com.ustudent.resquod.exception.*;
-import com.ustudent.resquod.exception.ObjectNotFoundException;
+import com.ustudent.resquod.model.dao.*;
 import com.ustudent.resquod.service.EventService;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +14,8 @@ import java.util.List;
 import java.util.Set;
 
 
-
 @RestController
-@Api(value="Event Management")
+@Api(value = "Event Management")
 public class EventController {
 
     private final EventService eventService;
@@ -63,14 +60,13 @@ public class EventController {
             @RequestBody EventData userInput) {
         try {
             eventService.changeEventData(userInput);
-        }catch (InvalidAdminId ex) {
+        } catch (InvalidAdminId ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No Permisson!");
-        }
-        catch (InvalidInputException ex) {
+        } catch (InvalidInputException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid input!");
-        }catch (PasswordAlreadyExists ex) {
+        } catch (PasswordAlreadyExists ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Try another Password/Key to event!");
-        }catch (RoomDoesntBelongToYourCorpo ex) {
+        } catch (RoomDoesntBelongToYourCorpo ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You Cannot use this room");
         } catch (ObjectNotFoundException e) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Object not Found");
@@ -80,13 +76,13 @@ public class EventController {
 
 
     @ApiOperation(value = "Add New Event", authorizations = {@Authorization(value = "authkey")})
-    @ApiResponses(value = { @ApiResponse(code = 200, message = "Event Added Succesfully"),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Event Added Succesfully"),
             @ApiResponse(code = 400, message = "\"Invalid Input\" or \"Event Already Exists\""),
-            @ApiResponse( code = 404, message = "Room Does Not Exist"),
+            @ApiResponse(code = 404, message = "Room Does Not Exist"),
             @ApiResponse(code = 401, message = "Permission Denied")})
     @PostMapping("/event")
     public ResponseTransfer addNewEvent(@ApiParam(value = "Required name, password, room id", required = true)
-                                            @RequestBody NewEventData newEvent) {
+                                        @RequestBody NewEventData newEvent) {
         try {
             eventService.addNewEvent(newEvent);
         } catch (EventAlreadyExistsException e) {
@@ -115,7 +111,7 @@ public class EventController {
     }
 
     @ApiOperation(value = "Returns Corporation's Events", authorizations = {@Authorization(value = "authkey")})
-    @ApiResponses(value = { @ApiResponse(code = 200, message = "Corporation events:"),
+    @ApiResponses(value = {@ApiResponse(code = 200, message = "Corporation events:"),
             @ApiResponse(code = 401, message = "Permission Denied")})
     @PostMapping(value = "/corpotationsEvents")
     public List<EventData> getCorpoEvents(@ApiParam(value = "Required corporation id", required = true)

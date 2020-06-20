@@ -2,23 +2,29 @@ package com.ustudent.resquod.model.dao;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import java.math.BigDecimal;
-
 public class EventDTO {
     private Long id;
     private String name;
     private Long administratorId;
     private String password;
     @JsonProperty
-    private RoomDTO r;
+    private RoomDTO room;
 
 
-    public EventDTO(Long id, String name, Long administratorId, String password, Long rId, String rName) {
+    public EventDTO(Long id, String name, Long administratorId, String password, RoomDTO room) {
         this.id = id;
         this.name = name;
         this.administratorId = administratorId;
         this.password = password;
-        r = new RoomDTO(rId, rName);
+        this.room=room;
+    }
+
+    public RoomDTO getRoom() {
+        return room;
+    }
+
+    public void setRoom(RoomDTO room) {
+        this.room = room;
     }
 
     public Long getId() {
