@@ -8,6 +8,7 @@ import com.ustudent.resquod.model.Corporation;
 import com.ustudent.resquod.model.Position;
 import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.dao.CorporationDTO;
 import com.ustudent.resquod.model.dao.NewRoomData;
 import com.ustudent.resquod.exception.InvalidAdminId;
 import com.ustudent.resquod.exception.InvalidInputException;
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashSet;
 import java.util.Set;
 
 @Service
@@ -87,8 +89,17 @@ public class RoomService {
     }
 
     public Set<RoomDTO> findCorpoRooms(Long id) {
-        Set<RoomDTO> cRooms = roomRepository.findByCorporationId(id);
-        return cRooms;
+        Set<Room> cRooms = roomRepository.findByCorporationId(id);
+        return getRoomDTO(cRooms);
+    }
+
+    private Set<RoomDTO> getRoomDTO(Set<Room> cRooms) {
+        Set<RoomDTO> roomU = new HashSet<>();
+        for (Room r:cRooms) {
+            CorporationDTO corporation=new CorporationDTO(r.getCorporation().getId(),r.getCorporation().getName());
+            roomU.add(new RoomDTO(r.getId(),r.getName(),corporation));
+        }
+        return roomU;
     }
 
     public void editRoomData(RoomDTO inputData) throws InvalidInputException, ObjectNotFoundException {

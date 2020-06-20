@@ -21,10 +21,7 @@ public interface RoomRepository extends JpaRepository<Room,Long> {
             "WHERE r.id = ?1 AND u.email = ?2")
     Optional<Room> findByRoomIdAndOwnerEmail(Long id, String email);
 
-    @Query(value = "SELECT new com.ustudent.resquod.model.dao.RoomDTO(r.id,r.name) " +
-            "FROM  Room r JOIN Corporation c ON r.corporation.id=c.id  " +
-            "WHERE c.id = ?1")
-    Set<RoomDTO> findByCorporationId(Long id);
+    Set<Room> findByCorporationId(Long id);
 
     @Query(value = "DELETE FROM Room r WHERE r.id=?1")
     void removeRoomById(Long id);
