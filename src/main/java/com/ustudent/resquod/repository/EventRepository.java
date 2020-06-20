@@ -14,7 +14,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
 
     Optional<Event> findById(Long id);
 
-    Optional<String> findByPassword(String password);
+    Optional<Event> findByPassword(String password);
 
     List<Event> findAll();
 
@@ -26,7 +26,7 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     Optional<Event> findByName(String name, Long roomId);
 
     @Query(value = "SELECT e FROM Event e " +
-        "INNER JOIN Room r ON r.id = e.room.id and r.corporation.id = ?1"
+            "INNER JOIN Room r ON r.id = e.room.id and r.corporation.id = ?1"
     )
     List<Event> findByCorpoId(Long corpoId);
 }
