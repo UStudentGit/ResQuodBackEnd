@@ -141,4 +141,22 @@ public class EventController {
         }
         return new ResponseTransfer("Successfully joined the event");
     }
+
+    @ApiOperation(value = "Returns event users", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = {@ApiResponse(code = 400, message = "Bad request"),
+            @ApiResponse(code = 403, message = "\"Event not found!\" or \"Users for this event not found!\" or \"You are not the administrator of this event!\""),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @GetMapping(value = "/getEventUsers/{eventId}")
+    public List<UserData> showAllEvents(@ApiParam(value = "Required event ID", required = true)
+                                        @PathVariable Long eventId) {
+        try {
+            return eventService.getEventUsers(eventId);
+        } catch (EventNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event not found!");
+        } catch (ObjectNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Users for this event not found!");
+        } catch (PermissionDeniedException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You are not the administrator of this event!");
+        }
+    }
 }
