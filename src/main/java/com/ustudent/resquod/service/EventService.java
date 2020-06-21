@@ -1,10 +1,7 @@
 package com.ustudent.resquod.service;
 
 import com.ustudent.resquod.exception.*;
-import com.ustudent.resquod.model.Corporation;
-import com.ustudent.resquod.model.Event;
-import com.ustudent.resquod.model.Room;
-import com.ustudent.resquod.model.User;
+import com.ustudent.resquod.model.*;
 import com.ustudent.resquod.model.dao.*;
 import com.ustudent.resquod.repository.EventRepository;
 import com.ustudent.resquod.validator.EventValidator;
@@ -22,18 +19,24 @@ public class EventService {
     private final RoomService roomService;
     private final UserService userService;
     private final CorporationService corporationService;
+    private final AttendanceListService attendanceListService;
+    private final PresenceService presenceService;
 
     @Autowired
     public EventService(EventValidator eventValidator,
                         EventRepository eventRepository,
                         RoomService roomService,
                         UserService userService,
-                        CorporationService corporationService) {
+                        CorporationService corporationService,
+                        AttendanceListService attendanceListService,
+                        PresenceService presenceService) {
         this.eventValidator = eventValidator;
         this.eventRepository = eventRepository;
         this.roomService = roomService;
         this.userService = userService;
         this.corporationService = corporationService;
+        this.attendanceListService = attendanceListService;
+        this.presenceService = presenceService;
     }
 
     public void addNewEvent(NewEventData newEvent) throws EventAlreadyExistsException, PermissionDeniedException {
@@ -154,5 +157,9 @@ public class EventService {
         users.add(user);
         event.setUsers(users);
         eventRepository.save(event);
+        List<AttendanceList> listOfAttendanceList = attendanceListService.getAttendanceList(event.getId());
+        for (AttendanceList attendanceList : listOfAttendanceList) {
+            presenceService.createPresence(user.getId(), attendanceList.getId());
+        }
     }
 }
