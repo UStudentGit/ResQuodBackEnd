@@ -122,4 +122,23 @@ public class EventController {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Permission Denied");
         }
     }
+
+    @ApiOperation(value = "Joining an event", authorizations = {@Authorization(value = "authkey")})
+    @ApiResponses(value = { @ApiResponse(code = 200, message = "Successfully joined the event"),
+            @ApiResponse(code = 400, message = "\"Wrong password\" or \"Event Does Not Exist\" or \"You already belong to this event\""),
+            @ApiResponse(code = 500, message = "Server Error!")})
+    @PostMapping(value = "/toEvent/{password}")
+    public ResponseTransfer toEvent(@ApiParam(value = "Required event password", required = true)
+                                    @PathVariable String password) {
+        try {
+            eventService.joinToEvent(password);
+        } catch (InvalidInputException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Wrong password");
+        } catch (ObjectNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event Does Not Exist");
+        } catch (UserBelongEventException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You already belong to this event");
+        }
+        return new ResponseTransfer("Successfully joined the event");
+    }
 }

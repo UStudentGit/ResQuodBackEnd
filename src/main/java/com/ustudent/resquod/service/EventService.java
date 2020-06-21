@@ -138,4 +138,21 @@ public class EventService {
         }
         return corpoEvents;
     }
+
+
+    public void joinToEvent(String password) throws InvalidInputException, ObjectNotFoundException, UserBelongEventException {
+        if (password == null) {
+            throw new InvalidInputException();
+        }
+        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
+        User user = userService.getUserByEmail(email);
+        Event event = eventRepository.findByPassword(password).orElseThrow(ObjectNotFoundException::new);
+        Set<User> users = event.getUsers();
+        if(users.contains(user)){
+            throw new UserBelongEventException();
+        }
+        users.add(user);
+        event.setUsers(users);
+        eventRepository.save(event);
+    }
 }

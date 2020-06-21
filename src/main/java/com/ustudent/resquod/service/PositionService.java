@@ -140,7 +140,7 @@ public class PositionService {
             }
         } else {
             Corporation corporation = corporationService.getCorpoById(CorporationId);
-            if (!(admin.getRole().equals("ROLE_OWNER") || admin.getCorporations().contains(corporation)))
+            if (!(admin.getRole().equals("ROLE_OWNER") && admin.getCorporations().contains(corporation)))
                 throw new PermissionDeniedException();
 
             positionsWithNulls = positionRepository.findCorpoNullTags(CorporationId);
