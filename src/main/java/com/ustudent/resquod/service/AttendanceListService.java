@@ -1,22 +1,21 @@
 package com.ustudent.resquod.service;
 
 
-import com.ustudent.resquod.exception.EmailExistException;
-import com.ustudent.resquod.exception.EventNotFoundException;
-import com.ustudent.resquod.exception.PermissionDeniedException;
-import com.ustudent.resquod.exception.WrongTimeFrameException;
+import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.AttendanceList;
 import com.ustudent.resquod.model.Event;
+import com.ustudent.resquod.model.Room;
 import com.ustudent.resquod.model.User;
-import com.ustudent.resquod.model.dao.AttendanceListData;
-import com.ustudent.resquod.model.dao.UserData;
+import com.ustudent.resquod.model.dao.*;
 import com.ustudent.resquod.repository.AttendanceListRepository;
 import com.ustudent.resquod.repository.EventRepository;
+import com.ustudent.resquod.repository.RoomRepository;
 import com.ustudent.resquod.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,14 +25,16 @@ public class AttendanceListService {
     private PresenceService presenceService;
     private EventRepository eventRepository;
     private UserRepository userRepository;
+    private RoomRepository roomRepository;
 
 
     @Autowired
-    AttendanceListService(AttendanceListRepository attendanceListRepository, PresenceService presenceService, EventRepository eventRepository, UserRepository userRepository) {
+    AttendanceListService(AttendanceListRepository attendanceListRepository, PresenceService presenceService, EventRepository eventRepository, UserRepository userRepository, RoomRepository roomRepository) {
         this.attendanceListRepository = attendanceListRepository;
         this.presenceService = presenceService;
         this.eventRepository = eventRepository;
         this.userRepository = userRepository;
+        this.roomRepository = roomRepository;
     }
 
     public List<AttendanceListData> findUserAttendanceLists() {
@@ -65,6 +66,21 @@ public class AttendanceListService {
     public List<AttendanceList> getAttendanceList(Long eventId) {
         List<AttendanceList> attendanceList = attendanceListRepository.findByEventId(eventId);
         return attendanceList;
+    }
+
+    public List<AttendanceListEventData> getAttendanceListEvent(Long eventId) throws EventNotFoundException, ObjectNotFoundException {
+        Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
+        List<AttendanceList> listOfAttendanceList = attendanceListRepository.findByEventId(eventId);
+        if(listOfAttendanceList.isEmpty()){
+            throw new ObjectNotFoundException();
+        }
+        List<AttendanceListEventData> attendanceListEventData = new ArrayList<>();
+        NewRoomData roomData = new NewRoomData(event.getRoom().getId(), event.getRoom().getName(), event.getRoom().getCorporation().getId());
+        EventRoomData eventData = new EventRoomData(event.getId(), event.getName(), event.getPassword(), roomData);
+        for (AttendanceList attendanceList : listOfAttendanceList) {
+            attendanceListEventData.add(new AttendanceListEventData(attendanceList.getId(), attendanceList.getName(), attendanceList.getStartTime(), attendanceList.getEndTime(), eventData));
+        }
+        return attendanceListEventData;
     }
 
     public List<UserData> getPresentUsers(Long attendanceListId) {

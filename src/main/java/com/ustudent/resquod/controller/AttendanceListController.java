@@ -3,6 +3,7 @@ package com.ustudent.resquod.controller;
 import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.AttendanceList;
 import com.ustudent.resquod.model.dao.AttendanceListData;
+import com.ustudent.resquod.model.dao.AttendanceListEventData;
 import com.ustudent.resquod.model.dao.ResponseTransfer;
 import com.ustudent.resquod.model.dao.UserData;
 import com.ustudent.resquod.service.AttendanceListService;
@@ -57,14 +58,16 @@ public class AttendanceListController {
     @ApiOperation(value = "Returns attendance list for specified event", authorizations = {@Authorization(value = "authkey")})
     @ApiResponses(value = {
             @ApiResponse(code = 400, message = "Bad request"),
-            @ApiResponse(code = 404, message = "EventId not found"),
+            @ApiResponse(code = 404, message = "\"Event not found!\" or \"Attendance lists for this event not found!\""),
             @ApiResponse(code = 500, message = "Server Error!")})
     @GetMapping("/attendancelist/{eventId}")
-    public List<AttendanceList> getAttendanceList(@PathVariable(value="eventId") Long eventId) {
+    public List<AttendanceListEventData> getAttendanceList(@PathVariable(value="eventId") Long eventId) {
         try {
-            return attendanceListService.getAttendanceList(eventId);
+            return attendanceListService.getAttendanceListEvent(eventId);
         } catch (EventNotFoundException ex) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event not found! Bad request");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Event not found!");
+        } catch (ObjectNotFoundException ex) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Attendance lists for this event not found!");
         }
     }
 

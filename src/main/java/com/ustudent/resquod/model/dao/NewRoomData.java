@@ -6,6 +6,12 @@ public class NewRoomData {
     private String name;
     private Long id;
 
+    public NewRoomData(Long id, String name, Long corporationId) {
+        this.id = id;
+        this.name = name;
+        this.corporationId = corporationId;
+    }
+
     public Long getId() { return id; }
 
     public void setId(Long id) { this.id = id; }

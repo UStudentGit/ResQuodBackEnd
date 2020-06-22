@@ -4,6 +4,7 @@ import com.ustudent.resquod.exception.*;
 import com.ustudent.resquod.model.*;
 import com.ustudent.resquod.model.dao.*;
 import com.ustudent.resquod.repository.EventRepository;
+import com.ustudent.resquod.repository.UserRepository;
 import com.ustudent.resquod.validator.EventValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,6 +22,7 @@ public class EventService {
     private final CorporationService corporationService;
     private final AttendanceListService attendanceListService;
     private final PresenceService presenceService;
+    private final UserRepository userRepository;
 
     @Autowired
     public EventService(EventValidator eventValidator,
@@ -29,7 +31,8 @@ public class EventService {
                         UserService userService,
                         CorporationService corporationService,
                         AttendanceListService attendanceListService,
-                        PresenceService presenceService) {
+                        PresenceService presenceService,
+                        UserRepository userRepository) {
         this.eventValidator = eventValidator;
         this.eventRepository = eventRepository;
         this.roomService = roomService;
@@ -37,6 +40,7 @@ public class EventService {
         this.corporationService = corporationService;
         this.attendanceListService = attendanceListService;
         this.presenceService = presenceService;
+        this.userRepository = userRepository;
     }
 
     public void addNewEvent(NewEventData newEvent) throws EventAlreadyExistsException, PermissionDeniedException {
@@ -161,5 +165,18 @@ public class EventService {
         for (AttendanceList attendanceList : listOfAttendanceList) {
             presenceService.createPresence(user.getId(), attendanceList.getId());
         }
+    }
+
+    public List<UserData> getEventUsers(Long eventId) throws EventNotFoundException, PermissionDeniedException, ObjectNotFoundException{
+        User user = userService.getLoggedUser();
+        Event event = eventRepository.findById(eventId).orElseThrow(EventNotFoundException::new);
+        if(!(user.getId() == event.getAdministratorId() || user.getRole().equals("ROLE_ADMIN") || (user.getRole().equals("ROLE_OWNER") && user.getCorporations().contains(event.getRoom().getCorporation())))){
+            throw new PermissionDeniedException();
+        }
+        List<UserData> users = userRepository.findUserDataByEventId(eventId);
+        if(users.isEmpty()){
+            throw new ObjectNotFoundException();
+        }
+        return users;
     }
 }

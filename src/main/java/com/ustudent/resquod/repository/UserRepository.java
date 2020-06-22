@@ -24,5 +24,9 @@ public interface UserRepository extends JpaRepository<User, Long> {
             "FROM  User u WHERE u.email = ?1")
     Optional<UserData> findUserData(String email);
 
+    @Query(value = "SELECT new com.ustudent.resquod.model.dao.UserData(u.email,u.role, u.name, u.surname) FROM  User u " +
+            "INNER JOIN u.events e ON e.id = ?1")
+    List<UserData> findUserDataByEventId(Long eventId);
+
     List<User> findAll();
 }
